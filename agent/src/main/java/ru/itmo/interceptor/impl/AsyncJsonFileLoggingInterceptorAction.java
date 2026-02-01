@@ -40,7 +40,6 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         WRITER.setDaemon(true);
         WRITER.setName("agent-async-writer");
         WRITER.start();
-
         Runtime.getRuntime().addShutdownHook(new Thread(WRITER::shutdown, "agent-writer-shutdown"));
     }
 
@@ -190,18 +189,18 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             return "null";
         }
 
-        String str;
+        String strValue;
         try {
-            str = value.toString();
+            strValue = String.valueOf(value);
         } catch (Throwable t) {
-            str = "<toString failed>";
+            strValue = "<toString failed>";
         }
 
         StringBuilder json = new StringBuilder();
         json.append('{');
         field(json, "type", value.getClass().getName());
         comma(json);
-        field(json, "value", str);
+        field(json, "value", strValue);
         json.append('}');
         return json.toString();
     }
@@ -268,21 +267,17 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             try (PrintWriter out = new PrintWriter(new FileWriter(file, true))) {
 
                 long lastFlush = System.currentTimeMillis();
-
                 while (running || !QUEUE.isEmpty()) {
-
                     String record = QUEUE.poll(500, TimeUnit.MILLISECONDS);
                     if (record != null) {
                         out.println(record);
                     }
-
                     long now = System.currentTimeMillis();
                     if (now - lastFlush >= FLUSH_INTERVAL_MS) {
                         out.flush();
                         lastFlush = now;
                     }
                 }
-
                 out.flush();
 
             } catch (Throwable ignored) {
