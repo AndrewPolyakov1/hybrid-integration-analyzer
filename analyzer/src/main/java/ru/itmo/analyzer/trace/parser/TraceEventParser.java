@@ -1,11 +1,11 @@
-package ru.itmo.analyzer.parser;
+package ru.itmo.analyzer.trace.parser;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.itmo.analyzer.deserializer.TraceObjectMapper;
-import ru.itmo.analyzer.model.TraceEvent;
+import ru.itmo.analyzer.trace.TraceObjectMapper;
+import ru.itmo.analyzer.trace.model.TraceEvent;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package ru.itmo.analyzer.parser;
+package ru.itmo.analyzer.trace.parser;
 
 import java.io.File;
 import java.io.IOException;

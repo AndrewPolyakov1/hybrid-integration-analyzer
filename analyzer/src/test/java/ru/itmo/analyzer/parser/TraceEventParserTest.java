@@ -1,6 +1,7 @@
 package ru.itmo.analyzer.parser;
 
 import org.junit.jupiter.api.Test;
+import ru.itmo.analyzer.trace.parser.TraceEventParser;
 
 import java.io.File;
 import java.io.IOException;

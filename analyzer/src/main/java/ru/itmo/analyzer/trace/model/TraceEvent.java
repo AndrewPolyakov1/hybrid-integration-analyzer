@@ -1,4 +1,4 @@
-package ru.itmo.analyzer.model;
+package ru.itmo.analyzer.trace.model;
 
 import java.util.List;
 
@@ -17,4 +17,7 @@ public record TraceEvent(
         ClassInfo instanceClass,
         List<Argument> arguments
 ) {
+    public boolean isEnter() {
+        return phase.equals(Phase.ENTER);
+    }
 }

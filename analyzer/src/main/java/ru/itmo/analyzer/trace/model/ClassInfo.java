@@ -1,4 +1,4 @@
-package ru.itmo.analyzer.model;
+package ru.itmo.analyzer.trace.model;
 
 /**
  * Информация о классе
@@ -6,5 +6,8 @@ package ru.itmo.analyzer.model;
  * @param name имя класса
  */
 public record ClassInfo(String name) {
+    public boolean isNull() {
+        return name == null || name.isBlank();
+    }
 }
 

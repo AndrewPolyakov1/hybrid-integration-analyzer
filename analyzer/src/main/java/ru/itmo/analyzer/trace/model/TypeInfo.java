@@ -1,4 +1,4 @@
-package ru.itmo.analyzer.model;
+package ru.itmo.analyzer.trace.model;
 
 /**
  * Информация о типе

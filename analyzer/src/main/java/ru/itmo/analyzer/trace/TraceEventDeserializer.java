@@ -1,20 +1,20 @@
-package ru.itmo.analyzer.deserializer;
+package ru.itmo.analyzer.trace;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ru.itmo.analyzer.model.Argument;
-import ru.itmo.analyzer.model.ClassInfo;
-import ru.itmo.analyzer.model.MethodInfo;
-import ru.itmo.analyzer.model.MethodSignature;
-import ru.itmo.analyzer.model.Phase;
-import ru.itmo.analyzer.model.ThreadInfo;
-import ru.itmo.analyzer.model.Timestamp;
-import ru.itmo.analyzer.model.TraceEvent;
-import ru.itmo.analyzer.model.TypeInfo;
-import ru.itmo.analyzer.model.ValueInfo;
+import ru.itmo.analyzer.trace.model.Argument;
+import ru.itmo.analyzer.trace.model.ClassInfo;
+import ru.itmo.analyzer.trace.model.MethodInfo;
+import ru.itmo.analyzer.trace.model.MethodSignature;
+import ru.itmo.analyzer.trace.model.Phase;
+import ru.itmo.analyzer.trace.model.ThreadInfo;
+import ru.itmo.analyzer.trace.model.Timestamp;
+import ru.itmo.analyzer.trace.model.TraceEvent;
+import ru.itmo.analyzer.trace.model.TypeInfo;
+import ru.itmo.analyzer.trace.model.ValueInfo;
 
 import java.io.IOException;
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package ru.itmo.analyzer.model;
+package ru.itmo.analyzer.trace.model;
 
 /**
  * Фаза работы метода
@@ -7,5 +7,5 @@ package ru.itmo.analyzer.model;
  */
 public enum Phase {
     ENTER,
-    EXIT;
+    EXIT
 }
