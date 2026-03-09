@@ -1,11 +1,15 @@
 package agent;
 
 import net.bytebuddy.dynamic.loading.ClassInjector;
+import scanner.ClassPathScanner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InjectorHelper {
@@ -38,7 +42,7 @@ public class InjectorHelper {
 
             try {
                 Map<String, byte[]> injectionMap = new HashMap<>();
-
+                Set<String> classNames = new ClassPathScanner().scan();
                 // 1. Load bytes for ALL required classes
                 for (String className : CLASSES_TO_INJECT) {
                     byte[] bytes = getClassBytes(className);

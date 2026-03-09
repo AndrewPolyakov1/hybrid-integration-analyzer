@@ -5,23 +5,15 @@ import net.bytebuddy.asm.Advice;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.security.ProtectionDomain;
 
-import static net.bytebuddy.matcher.ElementMatchers.*;
-
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.utility.JavaModule;
+import static net.bytebuddy.matcher.ElementMatchers.any;
+import static net.bytebuddy.matcher.ElementMatchers.isAbstract;
+import static net.bytebuddy.matcher.ElementMatchers.isMethod;
+import static net.bytebuddy.matcher.ElementMatchers.isNative;
+import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
+import static net.bytebuddy.matcher.ElementMatchers.not;
 
 public class Agent {
-
-    static {
-        // Keep your SLF4J config for the Agent itself,
-        // but be aware: LoggingInterceptorAction runs in the target classloader!
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-        System.setProperty("org.slf4j.simpleLogger.showDateTime", "true");
-        System.setProperty("org.slf4j.simpleLogger.showThreadName", "true");
-    }
 
     public static void premain(String agentArgs, Instrumentation inst) throws IOException {
         System.out.println("[Agent] Started");
