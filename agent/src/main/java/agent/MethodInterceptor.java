@@ -31,11 +31,20 @@ public class MethodInterceptor {
 
             // имя метода (быстрее, чем Method)
             @Advice.Origin("#t.#m")
-            String methodName
+            String methodName,
+            @Advice.Origin("#s")
+            String source
 
     ) throws InterruptedException {
-        logger.info("MethodInterceptor.onEnter " + methodName);
-        interceptorAction.executeBefore(thiz, args, method, methodName);
+        StackTraceElement caller = Thread.currentThread().getStackTrace()[1];
+
+        logger.info(
+                "Called from " +
+                        caller.getClassName() + "." +
+                        caller.getMethodName() +
+                        ":" + caller.getLineNumber());
+        logger.info("MethodInterceptor.onEnter " + methodName + " " + source);
+        interceptorAction.executeBefore(thiz, args, method, methodName, caller);
         return System.nanoTime();
     }
 
@@ -71,9 +80,15 @@ public class MethodInterceptor {
             @Advice.Origin("#t.#m")
             String methodName
     ) throws InterruptedException {
+        StackTraceElement caller = Thread.currentThread().getStackTrace()[1];
 
+        logger.info(
+                "Called exit from " +
+                        caller.getClassName() + "." +
+                        caller.getMethodName() +
+                        ":" + caller.getLineNumber());
         long durationNs = System.nanoTime() - startTime;
         logger.info("MethodInterceptor.onExit " + methodName);
-        interceptorAction.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName);
+        interceptorAction.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName, caller);
     }
 }

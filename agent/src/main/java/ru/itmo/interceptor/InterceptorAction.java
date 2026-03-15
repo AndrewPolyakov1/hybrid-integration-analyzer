@@ -15,8 +15,9 @@ public interface InterceptorAction {
      * @param args       arguments
      * @param method     method signature
      * @param methodName method name
+     * @param caller     caller of the method
      */
-    void executeBefore(Object thiz, Object[] args, Method method, String methodName) throws InterruptedException;
+    void executeBefore(Object thiz, Object[] args, Method method, String methodName, StackTraceElement caller) throws InterruptedException;
 
     ;
 
@@ -32,5 +33,5 @@ public interface InterceptorAction {
      * @param method      method signature
      */
     void executeAfter(long startTime, Object thiz, Object[] args, Object returnValue, Throwable throwable,
-                      Method method, String methodName) throws InterruptedException;
+                      Method method, String methodName, StackTraceElement caller) throws InterruptedException;
 }

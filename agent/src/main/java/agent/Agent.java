@@ -25,6 +25,7 @@ public class Agent {
                                 .or(nameStartsWith("sun."))
                                 .or(nameStartsWith("jdk."))
                                 .or(nameStartsWith("javax."))
+                                .or(nameStartsWith("ru.itmo.interceptor.impl."))
                                 .or(nameStartsWith("org.xml."))
                                 .or(nameStartsWith("com.sun.xml."))
                                 .or(nameStartsWith("agent.")) // Ignore our own package to avoid loops

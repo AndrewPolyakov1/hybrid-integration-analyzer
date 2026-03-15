@@ -52,7 +52,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             Object thiz,
             Object[] args,
             Method method,
-            String methodName
+            String methodName,
+            StackTraceElement caller
     ) throws InterruptedException {
         enqueue(buildJson(
                 "ENTER",
@@ -61,7 +62,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
                 args,
                 null,
                 null,
-                method
+                method,
+                caller
         ));
     }
 
@@ -73,7 +75,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             Object returnValue,
             Throwable throwable,
             Method method,
-            String methodName
+            String methodName,
+            StackTraceElement caller
     ) throws InterruptedException {
         long durationNs = startTime > 0
                 ? System.nanoTime() - startTime
@@ -86,7 +89,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
                 args,
                 returnValue,
                 throwable,
-                method
+                method,
+                caller
         ));
     }
 
@@ -112,7 +116,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             Object[] args,
             Object returnValue,
             Throwable throwable,
-            Method method
+            Method method,
+            StackTraceElement caller
     ) {
         StringBuilder json = new StringBuilder(512);
 
@@ -127,6 +132,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         field(json, "class", method.getDeclaringClass().getName());
         comma(json);
         field(json, "method", method.getName());
+        comma(json);
+        field(json, "line", String.valueOf(caller.getLineNumber()));
         comma(json);
         field(json, "signature", method.toGenericString());
         comma(json);

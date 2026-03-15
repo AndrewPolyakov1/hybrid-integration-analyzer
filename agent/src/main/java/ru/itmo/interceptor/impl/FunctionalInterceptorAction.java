@@ -21,7 +21,8 @@ public final class FunctionalInterceptorAction implements InterceptorAction {
             Object thiz,
             Object[] args,
             Method method,
-            String methodName
+            String methodName,
+            StackTraceElement caller
     ) {
         writeEvent(
                 "ENTER",
@@ -42,7 +43,7 @@ public final class FunctionalInterceptorAction implements InterceptorAction {
             Object returnValue,
             Throwable throwable,
             Method method,
-            String methodName
+            String methodName, StackTraceElement caller
     ) {
         long durationNs = startTime > 0
                 ? System.nanoTime() - startTime
