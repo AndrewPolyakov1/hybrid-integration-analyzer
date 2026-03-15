@@ -36,8 +36,16 @@ public class MethodInterceptor {
             String source
 
     ) throws InterruptedException {
-        StackTraceElement caller = Thread.currentThread().getStackTrace()[1];
-
+        StackTraceElement caller;
+        try {
+            caller = Thread.currentThread().getStackTrace()[2];
+        } catch (Exception e) {
+            logger.info("Caller undefined, setting empty");
+            caller = new StackTraceElement(MethodInterceptor.class.getName(),
+                    "none",
+                    null,
+                    -1);
+        }
         logger.info(
                 "Called from " +
                         caller.getClassName() + "." +
@@ -80,7 +88,16 @@ public class MethodInterceptor {
             @Advice.Origin("#t.#m")
             String methodName
     ) throws InterruptedException {
-        StackTraceElement caller = Thread.currentThread().getStackTrace()[1];
+        StackTraceElement caller;
+        try {
+            caller = Thread.currentThread().getStackTrace()[2];
+        } catch (Exception e) {
+            logger.info("Caller undefined, setting empty");
+            caller = new StackTraceElement(MethodInterceptor.class.getName(),
+                    "none",
+                    null,
+                    -1);
+        }
 
         logger.info(
                 "Called exit from " +

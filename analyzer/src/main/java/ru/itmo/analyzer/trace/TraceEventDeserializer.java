@@ -44,6 +44,10 @@ public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
         MethodInfo method = new MethodInfo(root.get("method").asText());
         MethodSignature signature = new MethodSignature(root.get("signature").asText());
         ClassInfo instanceClass = new ClassInfo(root.get("instanceClass").asText());
+        ClassInfo callerClass = new ClassInfo(root.get("callerClass").asText());
+        MethodInfo callerMethod = new MethodInfo(root.get("callerMethod").asText());
+
+
         Integer lineNumber = root.get("line").asInt();
         List<Argument> arguments = new ArrayList<>();
         for (JsonNode argNode : root.withArray("arguments")) {
@@ -61,6 +65,8 @@ public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
                 signature,
                 instanceClass,
                 arguments,
+                callerClass,
+                callerMethod,
                 lineNumber
         );
     }

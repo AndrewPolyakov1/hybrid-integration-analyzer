@@ -1,7 +1,9 @@
 package ru.itmo.analyzer.parser;
 
+import freemarker.template.TemplateException;
 import org.junit.jupiter.api.Test;
 import ru.itmo.analyzer.MethodMapping;
+import ru.itmo.analyzer.report.HtmlReportGenerator;
 import ru.itmo.analyzer.specification.parser.Lexer;
 import ru.itmo.analyzer.specification.parser.LibSlParser;
 import ru.itmo.analyzer.specification.parser.model.FiniteAutomaton;
@@ -13,6 +15,7 @@ import ru.itmo.analyzer.trace.parser.TraceEventParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -55,8 +58,10 @@ public class E2ETest {
             }
             """;
 
+    private VerificationResult res;
+
     @Test
-    public void testFullPipeline() {
+    public void testFullPipeline() throws TemplateException, IOException {
         System.out.println("═══ 1. PARSING LibSL SPEC ═══\n");
 
         var parser = new LibSlParser(libslSpec);
@@ -108,6 +113,9 @@ public class E2ETest {
         VerificationResult resultA = verifierA.verify(events);
         System.out.println(resultA);
 
+        var generator = new HtmlReportGenerator();
+        generator.generateToFile(resultA, Path.of("build", "reports", "verification.html"));
+
         // ═════════════════════════════════════════════════════════
         //  7. ВЕРИФИКАЦИЯ — СЦЕНАРИЙ B (корректный трейс)
         // ═════════════════════════════════════════════════════════
@@ -116,7 +124,7 @@ public class E2ETest {
     }
 
     @Test
-    public void testFullPipelineFail() {
+    public void testFullPipelineFail() throws TemplateException, IOException {
         System.out.println("═══ 1. PARSING LibSL SPEC ═══\n");
 
         var lexer = new Lexer(libslSpec);
@@ -170,10 +178,14 @@ public class E2ETest {
         VerificationResult resultA = verifierA.verify(events);
         System.out.println(resultA);
 
+        var generator = new HtmlReportGenerator();
+        generator.generateToFile(resultA, Path.of("build", "reports", "verification.html"));
+
         // ═════════════════════════════════════════════════════════
         //  7. ВЕРИФИКАЦИЯ — СЦЕНАРИЙ B (корректный трейс)
         // ═════════════════════════════════════════════════════════
         System.out.println("\n═══ 5. VERIFICATION — SCENARIO B ═══");
         System.out.println("   (полный корректный трейс: create → open → close)\n");
     }
+
 }

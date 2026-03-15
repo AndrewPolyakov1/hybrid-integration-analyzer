@@ -16,6 +16,8 @@ public record TraceEvent(
         MethodSignature signature,
         ClassInfo instanceClass,
         List<Argument> arguments,
+        ClassInfo callerClass,
+        MethodInfo callerMethod,
         Integer lineNumber
 ) {
     public boolean isEnter() {
