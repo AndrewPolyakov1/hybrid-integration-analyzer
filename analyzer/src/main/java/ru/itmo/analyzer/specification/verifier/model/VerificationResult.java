@@ -2,61 +2,23 @@ package ru.itmo.analyzer.specification.verifier.model;
 
 import ru.itmo.analyzer.trace.model.TraceEvent;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Результат верификации трейса по конечному автомату.
  */
 public record VerificationResult(
-        String              automatonName,
-        List<Violation>     violations,
+        String automatonName,
+        List<Violation> violations,
         Map<String, String> finalStates,          // instanceId → финальное состояние
-        int                 totalEvents,
-        int                 relevantEvents,
-        int                 successfulTransitions
+        int totalEvents,
+        int relevantEvents,
+        int successfulTransitions
 ) {
-    public boolean isValid() { return violations.isEmpty(); }
-
-    // ── Нарушение ──────────────────────────────────────────────
-    public record Violation(
-            int            eventIndex,
-            TraceEvent event,
-            String         instanceId,
-            String         currentState,
-            String         attemptedFunction,
-            List<String>   availableFunctions,
-            ViolationType  type,
-            String         detail
-    ) {
-        public enum ViolationType {
-            /** Нет перехода из текущего состояния по данному триггеру. */
-            NO_TRANSITION,
-            /** Переход существует, но guard-условие не выполнено. */
-            GUARD_FAILED
-        }
-
-        @Override
-        public String toString() {
-            return """
-                   ⚠ VIOLATION #%d [%s]
-                     Event:    %s.%s() at %s (thread: %s)
-                     Instance: %s
-                     State:    %s
-                     Trigger:  %s
-                     Detail:   %s
-                     Available triggers: %s\
-                   """.formatted(
-                    eventIndex, type,
-                    event.classInfo().name(), event.method().name(),
-                    event.timestamp(), event.thread().name(),
-                    instanceId,
-                    currentState,
-                    attemptedFunction,
-                    detail,
-                    availableFunctions
-            );
-        }
+    public boolean isValid() {
+        return violations.isEmpty();
     }
 
     // ── Красивый отчёт ─────────────────────────────────────────
@@ -103,5 +65,53 @@ public record VerificationResult(
     public Map<Violation.ViolationType, List<Violation>> violationsByType() {
         return violations.stream()
                 .collect(Collectors.groupingBy(Violation::type));
+    }
+
+    // ── Нарушение ──────────────────────────────────────────────
+    public record Violation(
+            int eventIndex,
+            TraceEvent event,
+            String instanceId,
+            String currentState,
+            String attemptedFunction,
+            List<String> availableFunctions,
+            ViolationType type,
+            String detail,
+            Integer lineNum
+    ) {
+        @Override
+        public String toString() {
+            return """
+                    ⚠ VIOLATION #%d [%s]
+                      Event:    %s.%s() at %s (thread: %s)
+                      Instance: %s
+                      Line number: %s
+                      State:    %s
+                      Trigger:  %s
+                      Detail:   %s
+                      Available triggers: %s\
+                    """.formatted(
+                    eventIndex, type,
+                    event.classInfo().name(), event.method().name(),
+                    event.timestamp(), event.thread().name(),
+                    instanceId,
+                    lineNum,
+                    currentState,
+                    attemptedFunction,
+                    detail,
+                    availableFunctions
+            );
+        }
+
+        public enum ViolationType {
+            /**
+             * Нет перехода из текущего состояния по данному триггеру.
+             */
+            NO_TRANSITION,
+            /**
+             * Переход существует, но guard-условие не выполнено.
+             */
+            GUARD_FAILED
+        }
     }
 }
