@@ -8,7 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-// ── Лексер ─────────────────────────────────────────────────────
+/**
+ * A lexical analyzer (lexer) that converts a LibSL source string
+ * into a sequence of {@link Token tokens}.
+ *
+ * <p>The lexer recognizes keywords defined by the LibSL specification,
+ * identifiers (including dot-separated qualified names), integer and
+ * string literals, single-character punctuation, the arrow operator
+ * ({@code ->}), as well as single-line ({@code //}) and multi-line
+ * ({@code /* ... * /}) comments.
+ *
+ * <p>Usage example:
+ * <pre>{@code
+ *     Lexer lexer = new Lexer(sourceText);
+ *     List<Token> tokens = lexer.tokenize();
+ * }</pre>
+ *
+ * @see Token
+ * @see TokenType
+ */
 public class Lexer {
 
     private static final Map<String, TokenType> KEYWORDS = Map.ofEntries(
@@ -27,104 +45,174 @@ public class Lexer {
             Map.entry("false", TokenType.FALSE)
     );
 
+    /**
+     * The source text being tokenized.
+     */
     private final String source;
+
+    /**
+     * Current position (index) in the source string.
+     */
     private int pos;
+
+    /**
+     * Current line number (1-based).
+     */
     private int line = 1;
+
+    /**
+     * Current column number (1-based).
+     */
     private int col = 1;
 
+    /**
+     * Constructs a new lexer for the given source text.
+     *
+     * @param source the source text to tokenize; must not be {@code null}
+     */
     public Lexer(String source) {
         this.source = source;
     }
 
-    private static Token tok(TokenType t, String v, int l, int c) {
-        return new Token(t, v, l, c);
+    /**
+     * Creates a new {@link Token} with the specified type, value, and
+     * source location.
+     *
+     * @param type  the token type
+     * @param value the textual value of the token
+     * @param line  the line number where the token starts
+     * @param col   the column number where the token starts
+     * @return a new token instance
+     */
+    private static Token token(TokenType type, String value, int line, int col) {
+        return new Token(type, value, line, col);
     }
 
-    // ── Основной метод ─────────────────────────────────────────
+    /**
+     * Tokenizes the entire source text and returns the resulting list of tokens.
+     *
+     * <p>The returned list always ends with a token of type
+     * {@link TokenType#EOF EOF}.
+     *
+     * @return an unmodifiable-style list of tokens
+     * @throws ParseException if an unexpected character or malformed
+     *                        literal is encountered
+     */
     public List<Token> tokenize() {
-        var tokens = new ArrayList<Token>();
+        List<Token> tokens = new ArrayList<>();
         while (pos < source.length()) {
             skipWhitespaceAndComments();
-            if (pos >= source.length()) break;
+            if (pos >= source.length()) {
+                break;
+            }
             tokens.add(readToken());
         }
         tokens.add(new Token(TokenType.EOF, "", line, col));
         return tokens;
     }
 
-    // ── Чтение одного токена ───────────────────────────────────
+    /**
+     * Reads and returns the next token starting at the current position.
+     *
+     * @return the next token
+     * @throws ParseException if the current character does not start
+     *                        any valid token
+     */
     private Token readToken() {
-        int sl = line, sc = col;
+        int startLine = line;
+        int startCol = col;
         char c = peek();
 
         return switch (c) {
             case '{' -> {
                 advance();
-                yield tok(TokenType.LBRACE, "{", sl, sc);
+                yield token(TokenType.LBRACE, "{", startLine, startCol);
             }
             case '}' -> {
                 advance();
-                yield tok(TokenType.RBRACE, "}", sl, sc);
+                yield token(TokenType.RBRACE, "}", startLine, startCol);
             }
             case '(' -> {
                 advance();
-                yield tok(TokenType.LPAREN, "(", sl, sc);
+                yield token(TokenType.LPAREN, "(", startLine, startCol);
             }
             case ')' -> {
                 advance();
-                yield tok(TokenType.RPAREN, ")", sl, sc);
+                yield token(TokenType.RPAREN, ")", startLine, startCol);
             }
             case ';' -> {
                 advance();
-                yield tok(TokenType.SEMICOLON, ";", sl, sc);
+                yield token(TokenType.SEMICOLON, ";", startLine, startCol);
             }
             case ':' -> {
                 advance();
-                yield tok(TokenType.COLON, ":", sl, sc);
+                yield token(TokenType.COLON, ":", startLine, startCol);
             }
             case '=' -> {
                 advance();
-                yield tok(TokenType.EQUALS, "=", sl, sc);
+                yield token(TokenType.EQUALS, "=", startLine, startCol);
             }
             case ',' -> {
                 advance();
-                yield tok(TokenType.COMMA, ",", sl, sc);
+                yield token(TokenType.COMMA, ",", startLine, startCol);
             }
             case '!' -> {
                 advance();
-                yield tok(TokenType.EXCLAMATION, "!", sl, sc);
+                yield token(TokenType.EXCLAMATION, "!", startLine, startCol);
             }
-            case '-' -> readArrow(sl, sc);
-            case '"' -> readString(sl, sc);
+            case '-' -> readArrow(startLine, startCol);
+            case '"' -> readStringLiteral(startLine, startCol);
             default -> {
-                if (Character.isLetter(c) || c == '_')
-                    yield readIdentifier(sl, sc);
-                if (Character.isDigit(c))
-                    yield readNumber(sl, sc);
-                throw new ParseException("Unexpected character: '" + c + "'", sl, sc);
+                if (Character.isLetter(c) || c == '_') {
+                    yield readIdentifierOrKeyword(startLine, startCol);
+                }
+                if (Character.isDigit(c)) {
+                    yield readIntLiteral(startLine, startCol);
+                }
+                throw new ParseException(
+                        "Unexpected character: '" + c + "'", startLine, startCol);
             }
         };
     }
 
-    // ── Стрелка -> ─────────────────────────────────────────────
-    private Token readArrow(int sl, int sc) {
-        advance(); // '-'
+    /**
+     * Reads an arrow token ({@code ->}).
+     *
+     * <p>The leading {@code '-'} has already been identified by the caller.
+     *
+     * @param startLine the line where the token starts
+     * @param startCol  the column where the token starts
+     * @return the arrow token
+     * @throws ParseException if {@code '>'} does not follow {@code '-'}
+     */
+    private Token readArrow(int startLine, int startCol) {
+        advance();
         if (pos < source.length() && peek() == '>') {
-            advance(); // '>'
-            return tok(TokenType.ARROW, "->", sl, sc);
+            advance();
+            return token(TokenType.ARROW, "->", startLine, startCol);
         }
-        throw new ParseException("Expected '>' after '-'", sl, sc);
+        throw new ParseException("Expected '>' after '-'", startLine, startCol);
     }
 
-    // ── Строковый литерал ──────────────────────────────────────
-    private Token readString(int sl, int sc) {
-        advance(); // opening "
-        var sb = new StringBuilder();
+    /**
+     * Reads a double-quoted string literal, handling escape sequences
+     * {@code \n}, {@code \t}, {@code \\}, and {@code \"}.
+     *
+     * @param startLine the line where the opening quote appears
+     * @param startCol  the column where the opening quote appears
+     * @return the string literal token (value does not include quotes)
+     * @throws ParseException if the string is not properly terminated
+     */
+    private Token readStringLiteral(int startLine, int startCol) {
+        advance();
+        StringBuilder sb = new StringBuilder();
         while (pos < source.length() && peek() != '"') {
             if (peek() == '\\') {
                 advance();
-                if (pos >= source.length())
-                    throw new ParseException("Unterminated escape in string", line, col);
+                if (pos >= source.length()) {
+                    throw new ParseException(
+                            "Unterminated escape in string", line, col);
+                }
                 sb.append(switch (peek()) {
                     case 'n' -> '\n';
                     case 't' -> '\t';
@@ -137,16 +225,29 @@ public class Lexer {
             }
             advance();
         }
-        if (pos >= source.length())
-            throw new ParseException("Unterminated string literal", sl, sc);
-        advance(); // closing "
-        return tok(TokenType.STRING_LITERAL, sb.toString(), sl, sc);
+        if (pos >= source.length()) {
+            throw new ParseException(
+                    "Unterminated string literal", startLine, startCol);
+        }
+        advance();
+        return token(TokenType.STRING_LITERAL, sb.toString(), startLine, startCol);
     }
 
-    // ── Идентификатор / ключевое слово ─────────────────────────
-    // Идентификаторы могут содержать точки (qualified names: custom.lib.File)
-    private Token readIdentifier(int sl, int sc) {
-        var sb = new StringBuilder();
+    /**
+     * Reads an identifier or keyword token.
+     *
+     * <p>Identifiers may contain letters, digits, underscores, and dots
+     * (to support qualified names such as {@code custom.lib.File}).
+     * If the resulting text matches a reserved keyword, the
+     * corresponding {@link TokenType} is used instead of
+     * {@link TokenType#IDENTIFIER}.
+     *
+     * @param startLine the line where the token starts
+     * @param startCol  the column where the token starts
+     * @return the identifier or keyword token
+     */
+    private Token readIdentifierOrKeyword(int startLine, int startCol) {
+        StringBuilder sb = new StringBuilder();
         while (pos < source.length()
                 && (Character.isLetterOrDigit(peek()) || peek() == '_' || peek() == '.')) {
             sb.append(peek());
@@ -154,50 +255,88 @@ public class Lexer {
         }
         String word = sb.toString();
         TokenType type = KEYWORDS.getOrDefault(word, TokenType.IDENTIFIER);
-        return tok(type, word, sl, sc);
+        return token(type, word, startLine, startCol);
     }
 
-    // ── Целочисленный литерал ──────────────────────────────────
-    private Token readNumber(int sl, int sc) {
-        var sb = new StringBuilder();
+    /**
+     * Reads a non-negative integer literal consisting of consecutive
+     * decimal digits.
+     *
+     * @param startLine the line where the token starts
+     * @param startCol  the column where the token starts
+     * @return the integer literal token
+     */
+    private Token readIntLiteral(int startLine, int startCol) {
+        StringBuilder sb = new StringBuilder();
         while (pos < source.length() && Character.isDigit(peek())) {
             sb.append(peek());
             advance();
         }
-        return tok(TokenType.INT_LITERAL, sb.toString(), sl, sc);
+        return token(TokenType.INT_LITERAL, sb.toString(), startLine, startCol);
     }
 
-    // ── Пропуск пробелов и комментариев ────────────────────────
+    /**
+     * Advances the current position past any whitespace characters and
+     * comments (both single-line {@code //} and multi-line
+     * {@code /* ... * /}).
+     */
     private void skipWhitespaceAndComments() {
         while (pos < source.length()) {
             char c = peek();
             if (Character.isWhitespace(c)) {
                 advance();
-            } else if (c == '/' && pos + 1 < source.length() && source.charAt(pos + 1) == '/') {
-                // однострочный комментарий
-                while (pos < source.length() && peek() != '\n') advance();
-            } else if (c == '/' && pos + 1 < source.length() && source.charAt(pos + 1) == '*') {
-                // многострочный комментарий
-                advance();
-                advance();
-                while (pos + 1 < source.length()
-                        && !(peek() == '*' && source.charAt(pos + 1) == '/'))
-                    advance();
-                if (pos + 1 < source.length()) {
-                    advance();
-                    advance();
-                }
+            } else if (c == '/' && pos + 1 < source.length()
+                    && source.charAt(pos + 1) == '/') {
+                skipSingleLineComment();
+            } else if (c == '/' && pos + 1 < source.length()
+                    && source.charAt(pos + 1) == '*') {
+                skipMultiLineComment();
             } else {
                 break;
             }
         }
     }
 
-    // ── Вспомогательные методы ─────────────────────────────────
+    /**
+     * Skips characters until the end of the current line.
+     * Assumes the position is at the leading {@code '/'}.
+     */
+    private void skipSingleLineComment() {
+        while (pos < source.length() && peek() != '\n') {
+            advance();
+        }
+    }
+
+    /**
+     * Skips characters until the closing {@code * /} sequence is found.
+     * Assumes the position is at the leading {@code '/'}.
+     */
+    private void skipMultiLineComment() {
+        advance();
+        advance();
+        while (pos + 1 < source.length()
+                && !(peek() == '*' && source.charAt(pos + 1) == '/')) {
+            advance();
+        }
+        if (pos + 1 < source.length()) {
+            advance();
+            advance();
+        }
+    }
+
+    /**
+     * Returns the character at the current position without advancing.
+     *
+     * @return the current character
+     */
     private char peek() {
         return source.charAt(pos);
     }
 
+    /**
+     * Advances the current position by one character, updating the
+     * line and column counters accordingly.
+     */
     private void advance() {
         if (pos < source.length()) {
             if (source.charAt(pos) == '\n') {
