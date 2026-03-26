@@ -1,8 +1,9 @@
 package ru.itmo.analyzer.specification.verifier.model;
 
 
-import ru.itmo.analyzer.MethodMapping;
-import ru.itmo.analyzer.specification.parser.model.FiniteAutomaton;
+import ru.itmo.analyzer.mapper.MethodMapping;
+import ru.itmo.analyzer.specification.parser.automaton.FireResult;
+import ru.itmo.analyzer.specification.parser.automaton.FiniteAutomaton;
 import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
 import ru.itmo.analyzer.trace.model.TraceEvent;
 
@@ -96,12 +97,12 @@ public class TraceVerifier {
         );
 
         // Попытка перехода
-        FiniteAutomaton.FireResult result = automaton.tryFire(functionName);
+        FireResult result = automaton.tryFire(functionName);
 
         switch (result) {
-            case FiniteAutomaton.FireResult.Success s -> successfulTransitions++;
+            case FireResult.Success s -> successfulTransitions++;
 
-            case FiniteAutomaton.FireResult.NoTransition nt -> violations.add(new VerificationResult.Violation(
+            case FireResult.NoTransition nt -> violations.add(new VerificationResult.Violation(
                     totalEvents,
                     event,
                     instanceId,
@@ -114,7 +115,7 @@ public class TraceVerifier {
                     event.lineNumber()
             ));
 
-            case FiniteAutomaton.FireResult.GuardFailed gf -> violations.add(new VerificationResult.Violation(
+            case FireResult.GuardFailed gf -> violations.add(new VerificationResult.Violation(
                     totalEvents,
                     event,
                     instanceId,
