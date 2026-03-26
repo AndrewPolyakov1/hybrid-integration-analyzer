@@ -11,11 +11,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Asynchronous {@link InterceptorAction} that writes method events
+ * to a JSON Lines file.
+ *
+ * <p>Events are enqueued and written by a background thread to minimize
+ * impact on application threads.
+ */
 public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorAction {
-
-    // =========================
-    // Config
-    // =========================
 
     private static final String LOG_FILE =
             System.getProperty("agent.log.file", "agent-method-calls.jsonl");
@@ -25,10 +28,6 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
 
     private static final long FLUSH_INTERVAL_MS =
             Long.getLong("agent.log.flush.ms", 1000);
-
-    // =========================
-    // State
-    // =========================
 
     private static final BlockingQueue<String> QUEUE =
             new ArrayBlockingQueue<>(QUEUE_SIZE);
@@ -40,12 +39,9 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         WRITER.setDaemon(true);
         WRITER.setName("agent-async-writer");
         WRITER.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(WRITER::shutdown, "agent-writer-shutdown"));
+        Runtime.getRuntime().addShutdownHook(
+                new Thread(WRITER::shutdown, "agent-writer-shutdown"));
     }
-
-    // =========================
-    // InterceptorAction
-    // =========================
 
     @Override
     public void executeBefore(
@@ -55,6 +51,7 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             String methodName,
             StackTraceElement caller
     ) throws InterruptedException {
+
         enqueue(buildJson(
                 "ENTER",
                 -1,
@@ -78,6 +75,7 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             String methodName,
             StackTraceElement caller
     ) throws InterruptedException {
+
         long durationNs = startTime > 0
                 ? System.nanoTime() - startTime
                 : -1;
@@ -94,20 +92,11 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         ));
     }
 
-    // =========================
-    // Queue
-    // =========================
-
     private void enqueue(String json) throws InterruptedException {
-        // НЕ блокируем приложение
         while (!QUEUE.offer(json)) {
-            Thread.sleep(100);// drop silently
+            Thread.sleep(100);
         }
     }
-
-    // =========================
-    // Writer thread
-    // =========================
 
     private String buildJson(
             String phase,
@@ -159,10 +148,6 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         return json.toString();
     }
 
-    // =========================
-    // JSON
-    // =========================
-
     private void field(StringBuilder json, String name, String value) {
         json.append('"').append(name).append("\":");
         if (value == null) {
@@ -191,27 +176,23 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         return arr.toString();
     }
 
-    // =========================
-    // Value formatting
-    // =========================
-
     private String formatValue(Object value) {
         if (value == null) {
             return "null";
         }
 
-        String strValue;
+        String str;
         try {
-            strValue = String.valueOf(value);
+            str = String.valueOf(value);
         } catch (Throwable t) {
-            strValue = "<toString failed>";
+            str = "<toString failed>";
         }
 
         StringBuilder json = new StringBuilder();
         json.append('{');
         field(json, "type", value.getClass().getName());
         comma(json);
-        field(json, "value", strValue);
+        field(json, "value", str);
         json.append('}');
         return json.toString();
     }
@@ -235,40 +216,34 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             switch (c) {
-                case '"':
-                    out.append("\\\"");
-                    break;
-                case '\\':
-                    out.append("\\\\");
-                    break;
-                case '\n':
-                    out.append("\\n");
-                    break;
-                case '\r':
-                    out.append("\\r");
-                    break;
-                case '\t':
-                    out.append("\\t");
-                    break;
-                default:
+                case '"' -> out.append("\\\"");
+                case '\\' -> out.append("\\\\");
+                case '\n' -> out.append("\\n");
+                case '\r' -> out.append("\\r");
+                case '\t' -> out.append("\\t");
+                default -> {
                     if (c < 32) {
                         out.append("\\u")
                                 .append(String.format("%04x", (int) c));
                     } else {
                         out.append(c);
                     }
+                }
             }
         }
         return out.toString();
     }
 
+    /**
+     * Background writer thread that drains the queue and writes to file.
+     */
     private static final class WriterThread extends Thread {
 
         private volatile boolean running = true;
 
         void shutdown() {
             running = false;
-            this.interrupt();
+            interrupt();
         }
 
         @Override
@@ -278,21 +253,24 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
             try (PrintWriter out = new PrintWriter(new FileWriter(file, true))) {
 
                 long lastFlush = System.currentTimeMillis();
+
                 while (running || !QUEUE.isEmpty()) {
                     String record = QUEUE.poll(500, TimeUnit.MILLISECONDS);
                     if (record != null) {
                         out.println(record);
                     }
+
                     long now = System.currentTimeMillis();
                     if (now - lastFlush >= FLUSH_INTERVAL_MS) {
                         out.flush();
                         lastFlush = now;
                     }
                 }
+
                 out.flush();
 
             } catch (Throwable ignored) {
-                // агент никогда не должен ломать JVM
+                // must not affect the host application
             }
         }
     }
