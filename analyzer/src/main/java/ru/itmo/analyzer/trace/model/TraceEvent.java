@@ -15,7 +15,10 @@ public record TraceEvent(
         MethodInfo method,
         MethodSignature signature,
         ClassInfo instanceClass,
-        List<Argument> arguments
+        List<Argument> arguments,
+        ClassInfo callerClass,
+        MethodInfo callerMethod,
+        Integer lineNumber
 ) {
     public boolean isEnter() {
         return phase.equals(Phase.ENTER);

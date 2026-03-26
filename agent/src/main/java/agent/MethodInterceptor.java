@@ -8,87 +8,100 @@ import ru.itmo.interceptor.impl.AsyncJsonFileLoggingInterceptorAction;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
-public class MethodInterceptor {
-    public static final InterceptorAction interceptorAction = new AsyncJsonFileLoggingInterceptorAction();
-    public static Logger logger = Logger.getLogger(MethodInterceptor.class.getName());
+/**
+ * Byte Buddy advice that intercepts method execution.
+ *
+ * <p>Delegates interception logic to an {@link InterceptorAction} implementation.
+ * Invoked on method entry and exit (including exceptional completion).
+ */
+public final class MethodInterceptor {
+
+    private static final InterceptorAction ACTION =
+            new AsyncJsonFileLoggingInterceptorAction();
+
+    private static final Logger LOGGER =
+            Logger.getLogger(MethodInterceptor.class.getName());
+
+    private MethodInterceptor() {
+    }
 
     /**
-     * Вызывается ПЕРЕД методом
+     * Invoked before the intercepted method execution.
+     *
+     * @param thiz       the instance, or {@code null} for static methods
+     * @param args       method arguments
+     * @param method     method reflection object
+     * @param methodName formatted method name
+     * @param source     source signature
+     * @return a timestamp used to measure execution duration
+     * @throws InterruptedException if the interceptor action fails
      */
     @Advice.OnMethodEnter
     public static long onEnter(
-
-            // this (null для static)
-            @Advice.This(optional = true)
-            Object thiz,
-
-            // все аргументы
-            @Advice.AllArguments
-            Object[] args,
-
-            // сигнатура метода
+            @Advice.This(optional = true) Object thiz,
+            @Advice.AllArguments Object[] args,
             @Advice.Origin Method method,
-
-            // имя метода (быстрее, чем Method)
-            @Advice.Origin("#t.#m")
-            String methodName,
-            @Advice.Origin("#s")
-            String source
-
+            @Advice.Origin("#t.#m") String methodName,
+            @Advice.Origin("#s") String source
     ) throws InterruptedException {
-        StackTraceElement caller = Thread.currentThread().getStackTrace()[1];
 
-        logger.info(
-                "Called from " +
-                        caller.getClassName() + "." +
-                        caller.getMethodName() +
-                        ":" + caller.getLineNumber());
-        logger.info("MethodInterceptor.onEnter " + methodName + " " + source);
-        interceptorAction.executeBefore(thiz, args, method, methodName, caller);
+        StackTraceElement caller = resolveCaller();
+
+        LOGGER.info(() -> "Enter " + methodName + " from "
+                + caller.getClassName() + "."
+                + caller.getMethodName() + ":"
+                + caller.getLineNumber());
+
+        ACTION.executeBefore(thiz, args, method, methodName, caller);
         return System.nanoTime();
     }
 
     /**
-     * Вызывается ПОСЛЕ метода (и при return, и при throw)
+     * Invoked after the intercepted method execution, including exceptional exit.
+     *
+     * @param startTime   timestamp returned by {@link #onEnter}
+     * @param thiz        the instance, or {@code null} for static methods
+     * @param args        method arguments
+     * @param returnValue return value, or {@code null} for {@code void}
+     * @param throwable   thrown exception, or {@code null} if none
+     * @param method      method reflection object
+     * @param methodName  formatted method name
+     * @throws InterruptedException if the interceptor action fails
      */
     @Advice.OnMethodExit(onThrowable = Throwable.class)
     public static void onExit(
-
-            // значение, возвращённое из onEnter
-            @Advice.Enter
-            long startTime,
-
-            // this
-            @Advice.This(optional = true)
-            Object thiz,
-
-            // аргументы (уже после выполнения метода)
-            @Advice.AllArguments
-            Object[] args,
-
-            // return value (null для void)
-            @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC)
-            Object returnValue,
-
-            // исключение (если было)
-            @Advice.Thrown(readOnly = false)
-            Throwable throwable,
-
-            // сигнатура
+            @Advice.Enter long startTime,
+            @Advice.This(optional = true) Object thiz,
+            @Advice.AllArguments Object[] args,
+            @Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object returnValue,
+            @Advice.Thrown(readOnly = false) Throwable throwable,
             @Advice.Origin Method method,
-
-            @Advice.Origin("#t.#m")
-            String methodName
+            @Advice.Origin("#t.#m") String methodName
     ) throws InterruptedException {
-        StackTraceElement caller = Thread.currentThread().getStackTrace()[1];
 
-        logger.info(
-                "Called exit from " +
-                        caller.getClassName() + "." +
-                        caller.getMethodName() +
-                        ":" + caller.getLineNumber());
+        StackTraceElement caller = resolveCaller();
         long durationNs = System.nanoTime() - startTime;
-        logger.info("MethodInterceptor.onExit " + methodName);
-        interceptorAction.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName, caller);
+
+        LOGGER.info(() -> "Exit " + methodName + " from "
+                + caller.getClassName() + "."
+                + caller.getMethodName() + ":"
+                + caller.getLineNumber()
+                + " (" + durationNs + " ns)");
+
+        ACTION.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName, caller);
+    }
+
+    private static StackTraceElement resolveCaller() {
+        try {
+            return Thread.currentThread().getStackTrace()[2];
+        } catch (Exception ex) {
+            LOGGER.fine("Caller not available");
+            return new StackTraceElement(
+                    MethodInterceptor.class.getName(),
+                    "unknown",
+                    null,
+                    -1
+            );
+        }
     }
 }
