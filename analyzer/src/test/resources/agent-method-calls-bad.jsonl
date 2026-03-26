@@ -1,4 +1,17 @@
 {
+  "timestamp": "2026-03-15T18:32:49.193226300Z",
+  "phase": "ENTER",
+  "thread": "main",
+  "class": "com.company.contest.FileUtils",
+  "method": "closeFile",
+  "callerClass": "com.company.contest.Main",
+  "callerMethod": "main",
+  "line": "13",
+  "signature": "public void com.company.contest.FileUtils.closeFile()",
+  "instanceClass": "com.company.contest.FileUtils",
+  "arguments": []
+}
+{
   "timestamp": "2026-03-15T18:32:49.183815400Z",
   "phase": "ENTER",
   "thread": "main",

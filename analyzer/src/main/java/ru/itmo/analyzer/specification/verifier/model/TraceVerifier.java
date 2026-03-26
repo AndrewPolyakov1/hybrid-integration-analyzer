@@ -44,6 +44,7 @@ public class TraceVerifier {
     private int totalEvents;
     private int relevantEvents;
     private int successfulTransitions;
+
     public TraceVerifier(
             AutomatonDeclaration declaration,
             MethodMapping mapping
@@ -91,7 +92,7 @@ public class TraceVerifier {
         String instanceId = computeInstanceKey(event);
         FiniteAutomaton automaton = instances.computeIfAbsent(
                 instanceId,
-                _k -> FiniteAutomaton.fromDeclaration(declaration)
+                ignored -> FiniteAutomaton.fromDeclaration(declaration)
         );
 
         // Попытка перехода
@@ -109,7 +110,8 @@ public class TraceVerifier {
                     nt.availableTriggers(),
                     VerificationResult.Violation.ViolationType.NO_TRANSITION,
                     "No transition for '%s' from state '%s'"
-                            .formatted(functionName, nt.currentState())
+                            .formatted(functionName, nt.currentState()),
+                    event.lineNumber()
             ));
 
             case FiniteAutomaton.FireResult.GuardFailed gf -> violations.add(new VerificationResult.Violation(
@@ -122,7 +124,8 @@ public class TraceVerifier {
                     VerificationResult.Violation.ViolationType.GUARD_FAILED,
                     "Guard '%s' failed for '%s' in state '%s'"
                             .formatted(gf.guardName(), functionName,
-                                    gf.currentState())
+                                    gf.currentState()),
+                    event.lineNumber()
             ));
         }
     }

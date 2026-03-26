@@ -2,19 +2,19 @@ package ru.itmo.analyzer.specification.parser;
 
 
 import ru.itmo.analyzer.specification.parser.error.ParseException;
-import ru.itmo.analyzer.specification.parser.model.ast.Statement;
-import ru.itmo.analyzer.specification.parser.model.ast.Expression;
 import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
+import ru.itmo.analyzer.specification.parser.model.ast.Expression;
 import ru.itmo.analyzer.specification.parser.model.ast.FunctionDeclaration;
 import ru.itmo.analyzer.specification.parser.model.ast.Parameter;
 import ru.itmo.analyzer.specification.parser.model.ast.Requirement;
 import ru.itmo.analyzer.specification.parser.model.ast.ShiftDeclaration;
 import ru.itmo.analyzer.specification.parser.model.ast.Specification;
 import ru.itmo.analyzer.specification.parser.model.ast.StateDeclaration;
-import ru.itmo.analyzer.specification.parser.model.tokenizer.Token;
-import ru.itmo.analyzer.specification.parser.model.tokenizer.TokenType;
+import ru.itmo.analyzer.specification.parser.model.ast.Statement;
 import ru.itmo.analyzer.specification.parser.model.ast.TypeDeclaration;
 import ru.itmo.analyzer.specification.parser.model.ast.VariableDeclaration;
+import ru.itmo.analyzer.specification.parser.model.tokenizer.Token;
+import ru.itmo.analyzer.specification.parser.model.tokenizer.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +26,11 @@ public class LibSlParser {
 
     public LibSlParser(List<Token> tokens) {
         this.tokens = tokens;
+    }
+
+    public LibSlParser(String libSlSpec) {
+        var lexer = new Lexer(libSlSpec);
+        this.tokens = lexer.tokenize();
     }
 
     // ═══════════════════════════════════════════════════════════

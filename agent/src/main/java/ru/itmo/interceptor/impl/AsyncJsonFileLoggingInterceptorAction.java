@@ -133,6 +133,10 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         comma(json);
         field(json, "method", method.getName());
         comma(json);
+        field(json, "callerClass", caller.getClassName());
+        comma(json);
+        field(json, "callerMethod", caller.getMethodName());
+        comma(json);
         field(json, "line", String.valueOf(caller.getLineNumber()));
         comma(json);
         field(json, "signature", method.toGenericString());
