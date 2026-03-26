@@ -85,6 +85,12 @@ public final class MethodMapping {
     }
 
     /**
+     * Result of a mapping resolution.
+     */
+    public record Resolution(String functionName) {
+    }
+
+    /**
      * Builder for {@link MethodMapping}.
      */
     public static final class Builder {
