@@ -16,13 +16,13 @@ import java.util.logging.Logger;
  */
 public final class MethodInterceptor {
 
-    private static final InterceptorAction ACTION =
+    public static final InterceptorAction ACTION =
             new AsyncJsonFileLoggingInterceptorAction();
 
-    private static final Logger LOGGER =
+    public static final Logger LOGGER =
             Logger.getLogger(MethodInterceptor.class.getName());
 
-    private MethodInterceptor() {
+    public MethodInterceptor() {
     }
 
     /**
@@ -47,7 +47,7 @@ public final class MethodInterceptor {
 
         StackTraceElement caller = resolveCaller();
 
-        LOGGER.info(() -> "Enter " + methodName + " from "
+        LOGGER.info("Enter " + methodName + " from "
                 + caller.getClassName() + "."
                 + caller.getMethodName() + ":"
                 + caller.getLineNumber());
@@ -82,7 +82,8 @@ public final class MethodInterceptor {
         StackTraceElement caller = resolveCaller();
         long durationNs = System.nanoTime() - startTime;
 
-        LOGGER.info(() -> "Exit " + methodName + " from "
+        // Убираем лямбду
+        LOGGER.info("Exit " + methodName + " from "
                 + caller.getClassName() + "."
                 + caller.getMethodName() + ":"
                 + caller.getLineNumber()
@@ -91,7 +92,7 @@ public final class MethodInterceptor {
         ACTION.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName, caller);
     }
 
-    private static StackTraceElement resolveCaller() {
+    public static StackTraceElement resolveCaller() {
         try {
             return Thread.currentThread().getStackTrace()[2];
         } catch (Exception ex) {
