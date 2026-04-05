@@ -1,6 +1,7 @@
 package ru.itmo.analyzer.parser;
 
 import freemarker.template.TemplateException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.itmo.analyzer.mapper.MethodMapping;
 import ru.itmo.analyzer.report.HtmlReportGenerator;
@@ -8,6 +9,7 @@ import ru.itmo.analyzer.specification.parser.Lexer;
 import ru.itmo.analyzer.specification.parser.LibSlParser;
 import ru.itmo.analyzer.specification.parser.automaton.FiniteAutomaton;
 import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
+import ru.itmo.analyzer.specification.parser.model.ast.Specification;
 import ru.itmo.analyzer.specification.verifier.model.TraceVerifier;
 import ru.itmo.analyzer.specification.verifier.model.VerificationResult;
 import ru.itmo.analyzer.trace.model.TraceEvent;
@@ -19,6 +21,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class E2ETest {
@@ -187,5 +192,4 @@ public class E2ETest {
         System.out.println("\n═══ 5. VERIFICATION — SCENARIO B ═══");
         System.out.println("   (полный корректный трейс: create → open → close)\n");
     }
-
 }
