@@ -1,10 +1,13 @@
 package ru.itmo.analyzer.trace;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import ru.itmo.analyzer.specification.parser.model.ast.TypeDeclaration;
 import ru.itmo.analyzer.trace.model.Argument;
 import ru.itmo.analyzer.trace.model.ClassInfo;
 import ru.itmo.analyzer.trace.model.MethodInfo;
@@ -22,6 +25,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
 
@@ -47,6 +52,9 @@ public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
         ClassInfo callerClass = new ClassInfo(root.get("callerClass").asText());
         MethodInfo callerMethod = new MethodInfo(root.get("callerMethod").asText());
 
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> callerObject = mapper.convertValue(root.get("callerObject"), new TypeReference<>() {
+        });
 
         Integer lineNumber = root.get("line").asInt();
         List<Argument> arguments = new ArrayList<>();
@@ -66,6 +74,7 @@ public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
                 instanceClass,
                 arguments,
                 callerClass,
+                callerObject,
                 callerMethod,
                 lineNumber
         );

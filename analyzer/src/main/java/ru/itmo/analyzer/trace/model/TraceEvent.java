@@ -1,6 +1,7 @@
 package ru.itmo.analyzer.trace.model;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Представление объекта вызова метода
@@ -17,6 +18,7 @@ public record TraceEvent(
         ClassInfo instanceClass,
         List<Argument> arguments,
         ClassInfo callerClass,
+        Map<String, Object> callerObject,
         MethodInfo callerMethod,
         Integer lineNumber
 ) {

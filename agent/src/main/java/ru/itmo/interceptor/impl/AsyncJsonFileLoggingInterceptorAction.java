@@ -248,7 +248,7 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         if (jsonCallerObj == null) {
             json.append("null");
         } else {
-            json.append(jsonCallerObj); // ← без кавычек
+            json.append(jsonCallerObj);
         }
         comma(json);
         field(json, "line", String.valueOf(caller.getLineNumber()));
