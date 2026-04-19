@@ -6,6 +6,8 @@ import net.bytebuddy.description.NamedElement;
 import net.bytebuddy.matcher.ElementMatcher;
 
 import java.lang.instrument.Instrumentation;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static net.bytebuddy.matcher.ElementMatchers.any;
@@ -36,11 +38,11 @@ public final class Agent {
     public static void premain(String agentArgs, Instrumentation inst) {
         System.out.println("[Agent] Started");
 
-        List<String> filterData = List.of(agentArgs.split("\\s*,\\s*"));
+        List<String> filterData = agentArgs != null ? Arrays.asList(agentArgs.split("\\s*,\\s*")) : new ArrayList<>();
         System.out.println("[Agent] Filter: " + filterData);
 
         ElementMatcher.Junction<NamedElement> filter = null;
-        for (var element : filterData) {
+        for (String element : filterData) {
             if (filter == null) {
                 filter = nameStartsWith(element);
                 System.out.println("[Agent] start filter: " + element);
@@ -54,6 +56,7 @@ public final class Agent {
         }
 
         new AgentBuilder.Default()
+                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .ignore(
                         nameStartsWith("net.bytebuddy.")
                                 .or(nameStartsWith("java."))

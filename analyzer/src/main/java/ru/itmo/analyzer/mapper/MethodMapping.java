@@ -1,6 +1,14 @@
 package ru.itmo.analyzer.mapper;
 
-import java.util.*;
+import ru.itmo.analyzer.specification.parser.model.ast.Specification;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Maps traced methods to automaton function names.
@@ -40,7 +48,7 @@ public final class MethodMapping {
      * @param className  fully qualified class name
      * @param methodName method name
      * @return the corresponding function name, or an empty {@code Optional}
-     *         if no mapping is defined
+     * if no mapping is defined
      */
     public Optional<String> resolve(String className, String methodName) {
         String fn = explicit.get(new MethodKey(className, methodName));
@@ -107,6 +115,16 @@ public final class MethodMapping {
          */
         public Builder map(String className, String methodName, String functionName) {
             explicit.put(new MethodKey(className, methodName), functionName);
+            return this;
+        }
+
+        public Builder fromSpec(Specification specification) {
+            for (var automaton : specification.automata()) {
+                String classname = automaton.name();
+                for (var method : automaton.functions()) {
+                    this.map(classname, method.name(), method.name());
+                }
+            }
             return this;
         }
 

@@ -71,7 +71,9 @@ public class InjectorHelper {
                 throw new IOException("Could not find class resource: " + resource +
                         ". Check if it's in the JAR.");
             }
-            return is.readAllBytes();
+            byte[] bytes = new byte[]{};
+            is.read(bytes);
+            return bytes;
         }
     }
 }

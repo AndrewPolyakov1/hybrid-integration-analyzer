@@ -15,6 +15,11 @@ public class Main {
         fileUtils.openFile("test.txt");
         fileUtils.closeFile();
         otherLib.doNothing();
+
+        TestIntegrationLib testIntegrationLib = new TestIntegrationLib();
+        testIntegrationLib.changePrivate(true);
+        testIntegrationLib.changePrivate(false);
+
         log.info("Finishing main");
     }
 }
