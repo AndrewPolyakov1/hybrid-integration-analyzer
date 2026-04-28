@@ -20,6 +20,14 @@ public class Main {
         testIntegrationLib.changePrivate(true);
         testIntegrationLib.changePrivate(false);
 
+        File file = new File();
+        file.open();
+
+        file.read();
+        file.read();
+
+        file.close();
+
         log.info("Finishing main");
     }
 }
