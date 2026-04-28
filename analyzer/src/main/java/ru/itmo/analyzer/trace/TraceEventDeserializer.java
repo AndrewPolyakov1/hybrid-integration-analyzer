@@ -51,6 +51,7 @@ public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
         ClassInfo instanceClass = new ClassInfo(root.get("instanceClass").asText());
         ClassInfo callerClass = new ClassInfo(root.get("callerClass").asText());
         MethodInfo callerMethod = new MethodInfo(root.get("callerMethod").asText());
+        Integer callerObjectId = root.get("callerObjectId").asInt();
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> callerObject = mapper.convertValue(root.get("callerObject"), new TypeReference<>() {
@@ -75,6 +76,7 @@ public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
                 arguments,
                 callerClass,
                 callerObject,
+                callerObjectId,
                 callerMethod,
                 lineNumber
         );

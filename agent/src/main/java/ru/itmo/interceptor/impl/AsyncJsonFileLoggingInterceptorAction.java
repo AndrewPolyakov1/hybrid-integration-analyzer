@@ -59,7 +59,7 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         }
 
         // ограничение глубины (очень важно!)
-        if (depth > 3) {
+        if (depth > 2) {
             return "\"<max-depth>\"";
         }
 
@@ -83,6 +83,9 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         // массивы
         if (clazz.isArray()) {
             int len = Array.getLength(obj);
+            if (len > 10) {
+                return "[]";
+            }
             StringBuilder sb = new StringBuilder();
             sb.append("[");
 
@@ -243,6 +246,8 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         field(json, "callerClass", caller.getClassName());
         comma(json);
         field(json, "callerMethod", caller.getMethodName());
+        comma(json);
+        field(json, "callerObjectId", String.valueOf(System.identityHashCode(thiz)));
         comma(json);
         json.append("\"callerObject\":");
         if (jsonCallerObj == null) {

@@ -19,6 +19,7 @@ public record TraceEvent(
         List<Argument> arguments,
         ClassInfo callerClass,
         Map<String, Object> callerObject,
+        Integer callerObjectId,
         MethodInfo callerMethod,
         Integer lineNumber
 ) {

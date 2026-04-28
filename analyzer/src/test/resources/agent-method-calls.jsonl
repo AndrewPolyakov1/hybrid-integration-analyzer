@@ -1,11 +1,12 @@
 {
-  "timestamp": "2026-04-19T19:51:37.049619600Z",
+  "timestamp": "2026-04-28T17:20:15.012978500Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "openFile",
   "callerClass": "com.company.contest.FileUtils",
   "callerMethod": "openFile",
+  "callerObjectId": "238431319",
   "callerObject": {
     "path": null
   },
@@ -20,13 +21,14 @@
   ]
 }
 {
-  "timestamp": "2026-04-19T19:51:37.049619600Z",
+  "timestamp": "2026-04-28T17:20:15.012978500Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "openFile",
   "callerClass": "com.company.contest.FileUtils",
   "callerMethod": "openFile",
+  "callerObjectId": "238431319",
   "callerObject": {
     "path": "test.txt"
   },
@@ -41,16 +43,17 @@
   ],
   "returnValue": null,
   "exception": null,
-  "durationNs": 294000
+  "durationNs": 321500
 }
 {
-  "timestamp": "2026-04-19T19:51:37.049619600Z",
+  "timestamp": "2026-04-28T17:20:15.012978500Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "closeFile",
   "callerClass": "com.company.contest.FileUtils",
   "callerMethod": "closeFile",
+  "callerObjectId": "238431319",
   "callerObject": {
     "path": "test.txt"
   },
@@ -60,13 +63,14 @@
   "arguments": []
 }
 {
-  "timestamp": "2026-04-19T19:51:37.050621Z",
+  "timestamp": "2026-04-28T17:20:15.013978400Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "closeFile",
   "callerClass": "com.company.contest.FileUtils",
   "callerMethod": "closeFile",
+  "callerObjectId": "238431319",
   "callerObject": {
     "path": "test.txt"
   },
@@ -76,16 +80,17 @@
   "arguments": [],
   "returnValue": null,
   "exception": null,
-  "durationNs": 204700
+  "durationNs": 288200
 }
 {
-  "timestamp": "2026-04-19T19:51:37.056619500Z",
+  "timestamp": "2026-04-28T17:20:15.019979200Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "open",
   "callerClass": "com.company.contest.File",
   "callerMethod": "open",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": false
   },
@@ -95,13 +100,14 @@
   "arguments": []
 }
 {
-  "timestamp": "2026-04-19T19:51:37.057620Z",
+  "timestamp": "2026-04-28T17:20:15.020979200Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "open",
   "callerClass": "com.company.contest.File",
   "callerMethod": "open",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": true
   },
@@ -111,16 +117,17 @@
   "arguments": [],
   "returnValue": null,
   "exception": null,
-  "durationNs": 232700
+  "durationNs": 262400
 }
 {
-  "timestamp": "2026-04-19T19:51:37.057620Z",
+  "timestamp": "2026-04-28T17:20:15.020979200Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "read",
   "callerClass": "com.company.contest.File",
   "callerMethod": "read",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": true
   },
@@ -130,13 +137,14 @@
   "arguments": []
 }
 {
-  "timestamp": "2026-04-19T19:51:37.057620Z",
+  "timestamp": "2026-04-28T17:20:15.020979200Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "read",
   "callerClass": "com.company.contest.File",
   "callerMethod": "read",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": true
   },
@@ -149,16 +157,17 @@
     "value": "read"
   },
   "exception": null,
-  "durationNs": 171200
+  "durationNs": 249800
 }
 {
-  "timestamp": "2026-04-19T19:51:37.057620Z",
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "read",
   "callerClass": "com.company.contest.File",
   "callerMethod": "read",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": true
   },
@@ -168,13 +177,14 @@
   "arguments": []
 }
 {
-  "timestamp": "2026-04-19T19:51:37.058623100Z",
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "read",
   "callerClass": "com.company.contest.File",
   "callerMethod": "read",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": true
   },
@@ -187,16 +197,17 @@
     "value": "read"
   },
   "exception": null,
-  "durationNs": 160300
+  "durationNs": 150700
 }
 {
-  "timestamp": "2026-04-19T19:51:37.058623100Z",
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "close",
   "callerClass": "com.company.contest.File",
   "callerMethod": "close",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": true
   },
@@ -206,13 +217,14 @@
   "arguments": []
 }
 {
-  "timestamp": "2026-04-19T19:51:37.058623100Z",
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.File",
   "method": "close",
   "callerClass": "com.company.contest.File",
   "callerMethod": "close",
+  "callerObjectId": "823758059",
   "callerObject": {
     "isOpen": false
   },
@@ -222,5 +234,5 @@
   "arguments": [],
   "returnValue": null,
   "exception": null,
-  "durationNs": 155100
+  "durationNs": 154000
 }
