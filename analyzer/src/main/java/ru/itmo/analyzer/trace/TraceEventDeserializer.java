@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import ru.itmo.analyzer.specification.parser.model.ast.TypeDeclaration;
 import ru.itmo.analyzer.trace.model.Argument;
 import ru.itmo.analyzer.trace.model.ClassInfo;
 import ru.itmo.analyzer.trace.model.MethodInfo;
@@ -26,7 +25,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class TraceEventDeserializer extends JsonDeserializer<TraceEvent> {
 

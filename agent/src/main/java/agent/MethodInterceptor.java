@@ -1,15 +1,12 @@
 package agent;
 
+import filter.MethodFilter;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import ru.itmo.interceptor.InterceptorAction;
 import ru.itmo.interceptor.impl.AsyncJsonFileLoggingInterceptorAction;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.IdentityHashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -55,8 +52,10 @@ public final class MethodInterceptor {
                 + caller.getClassName() + "."
                 + caller.getMethodName() + ":"
                 + caller.getLineNumber());
-
-        ACTION.executeBefore(thiz, args, method, methodName, caller);
+//        LOGGER.info("ACCEPTS: " + MethodFilter.getInstance().accepts(methodName));
+        if (MethodFilter.getInstance().accepts(methodName)) {
+            ACTION.executeBefore(thiz, args, method, methodName, caller);
+        }
         return System.nanoTime();
     }
 
@@ -93,7 +92,10 @@ public final class MethodInterceptor {
                 + caller.getLineNumber()
                 + " (" + durationNs + " ns)");
 
-        ACTION.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName, caller);
+        if (MethodFilter.getInstance().accepts(methodName)) {
+            ACTION.executeAfter(startTime, thiz, args, returnValue, throwable, method, methodName, caller);
+        }
+
     }
 
     public static StackTraceElement resolveCaller() {

@@ -1,8 +1,8 @@
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.itmo.analyzer.specification.parser.Lexer;
-import ru.itmo.analyzer.specification.parser.LibSlParser;
-import ru.itmo.analyzer.specification.parser.automaton.FiniteAutomaton;
+import ru.itmo.analyser.specification.parser.Lexer;
+import ru.itmo.analyser.specification.parser.LibSlParser;
+import ru.itmo.analyser.specification.parser.automaton.FiniteAutomaton;
 
 public class LibSlParserTest {
 

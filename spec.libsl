@@ -1,0 +1,31 @@
+libsl "1.0.0";
+library File version "1.0.0";
+types {
+File (custom.lib.File);
+String (string)
+}
+
+automaton com.company.contest.File : File {
+    initstate Unknown;
+    state Created;
+    state Opened;
+    state Closed;
+
+    var exists: bool = false;
+
+    shift Unknown -> Created(create);
+    shift Unknown -> Opened(open);
+    shift Created -> Opened(open);
+    shift Opened -> Opened(read);
+    shift Opened -> Closed(close);
+
+    fun create()
+    requires isNotExists: !exists;
+    fun delete()
+    {
+        exists = true;
+    }
+    fun open();
+    fun close();
+    fun read();
+}

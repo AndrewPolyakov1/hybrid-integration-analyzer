@@ -11,6 +11,9 @@ public class File {
     void open() {
         isOpen = true;
     }
+    void open(String name) {
+        isOpen = true;
+    }
 
     String read() {
         return "read";

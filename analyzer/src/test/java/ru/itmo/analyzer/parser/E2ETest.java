@@ -2,16 +2,16 @@ package ru.itmo.analyzer.parser;
 
 import freemarker.template.TemplateException;
 import org.junit.jupiter.api.Test;
+import ru.itmo.analyser.specification.parser.Lexer;
+import ru.itmo.analyser.specification.parser.LibSlParser;
+import ru.itmo.analyser.specification.parser.automaton.FiniteAutomaton;
+import ru.itmo.analyser.specification.parser.model.ast.AutomatonDeclaration;
 import ru.itmo.analyzer.mapper.MethodMapping;
 import ru.itmo.analyzer.report.HtmlReportGenerator;
-import ru.itmo.analyzer.specification.parser.Lexer;
-import ru.itmo.analyzer.specification.parser.LibSlParser;
-import ru.itmo.analyzer.specification.parser.automaton.FiniteAutomaton;
-import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
-import ru.itmo.analyzer.specification.verifier.model.TraceVerifier;
-import ru.itmo.analyzer.specification.verifier.model.VerificationResult;
 import ru.itmo.analyzer.trace.model.TraceEvent;
 import ru.itmo.analyzer.trace.parser.TraceEventParser;
+import ru.itmo.analyzer.verifier.TraceVerifier;
+import ru.itmo.analyzer.verifier.model.VerificationResult;
 
 import java.io.File;
 import java.io.IOException;

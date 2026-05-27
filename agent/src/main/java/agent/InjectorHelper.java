@@ -5,9 +5,7 @@ import scanner.ClassPathScanner;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +20,10 @@ public class InjectorHelper {
             "ru.itmo.interceptor.InterceptorAction",        // The Interface
             "ru.itmo.interceptor.impl.LoggingInterceptorAction", // The Implementation
             "ru.itmo.interceptor.impl.AsyncJsonFileLoggingInterceptorAction", // The Implementation
-            "agent.MethodInterceptor"                      // The Advice Class
+            "agent.MethodInterceptor",                      // The Advice Class
+            "filter.MethodFilter",                          // The Filter Class
+            "ru.itmo.analyser.specification.parser.LibSlParser",
+            "ru.itmo.analyser.specification.parser.model.ast.Specification"
     };
 
     public static void ensureInjected(ClassLoader targetLoader) {
