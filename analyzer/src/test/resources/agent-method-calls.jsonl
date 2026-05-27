@@ -1,30 +1,16 @@
 {
-  "timestamp": "2026-03-15T18:32:49.183815400Z",
-  "phase": "ENTER",
-  "thread": "main",
-  "class": "com.company.contest.Main",
-  "method": "main",
-  "callerClass": "agent.MethodInterceptor",
-  "callerMethod": "none",
-  "line": "-1",
-  "signature": "public static void com.company.contest.Main.main(java.lang.String[])",
-  "instanceClass": null,
-  "arguments": [
-    {
-      "type": "[Ljava.lang.String;",
-      "value": "[Ljava.lang.String;@5fb97279"
-    }
-  ]
-}
-{
-  "timestamp": "2026-03-15T18:32:49.192223700Z",
+  "timestamp": "2026-04-28T17:20:15.012978500Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "openFile",
-  "callerClass": "com.company.contest.Main",
-  "callerMethod": "main",
-  "line": "12",
+  "callerClass": "com.company.contest.FileUtils",
+  "callerMethod": "openFile",
+  "callerObjectId": "238431319",
+  "callerObject": {
+    "path": null
+  },
+  "line": "8",
   "signature": "public void com.company.contest.FileUtils.openFile(java.lang.String)",
   "instanceClass": "com.company.contest.FileUtils",
   "arguments": [
@@ -35,14 +21,18 @@
   ]
 }
 {
-  "timestamp": "2026-03-15T18:32:49.192223700Z",
+  "timestamp": "2026-04-28T17:20:15.012978500Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "openFile",
-  "callerClass": "com.company.contest.Main",
-  "callerMethod": "main",
-  "line": "12",
+  "callerClass": "com.company.contest.FileUtils",
+  "callerMethod": "openFile",
+  "callerObjectId": "238431319",
+  "callerObject": {
+    "path": "test.txt"
+  },
+  "line": "11",
   "signature": "public void com.company.contest.FileUtils.openFile(java.lang.String)",
   "instanceClass": "com.company.contest.FileUtils",
   "arguments": [
@@ -53,55 +43,196 @@
   ],
   "returnValue": null,
   "exception": null,
-  "durationNs": 419000
+  "durationNs": 321500
 }
 {
-  "timestamp": "2026-03-15T18:32:49.193226300Z",
+  "timestamp": "2026-04-28T17:20:15.012978500Z",
   "phase": "ENTER",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "closeFile",
-  "callerClass": "com.company.contest.Main",
-  "callerMethod": "main",
-  "line": "13",
+  "callerClass": "com.company.contest.FileUtils",
+  "callerMethod": "closeFile",
+  "callerObjectId": "238431319",
+  "callerObject": {
+    "path": "test.txt"
+  },
+  "line": "14",
   "signature": "public void com.company.contest.FileUtils.closeFile()",
   "instanceClass": "com.company.contest.FileUtils",
   "arguments": []
 }
 {
-  "timestamp": "2026-03-15T18:32:49.193226300Z",
+  "timestamp": "2026-04-28T17:20:15.013978400Z",
   "phase": "EXIT",
   "thread": "main",
   "class": "com.company.contest.FileUtils",
   "method": "closeFile",
-  "callerClass": "com.company.contest.Main",
-  "callerMethod": "main",
-  "line": "13",
+  "callerClass": "com.company.contest.FileUtils",
+  "callerMethod": "closeFile",
+  "callerObjectId": "238431319",
+  "callerObject": {
+    "path": "test.txt"
+  },
+  "line": "15",
   "signature": "public void com.company.contest.FileUtils.closeFile()",
   "instanceClass": "com.company.contest.FileUtils",
   "arguments": [],
   "returnValue": null,
   "exception": null,
-  "durationNs": 515700
+  "durationNs": 288200
 }
 {
-  "timestamp": "2026-03-15T18:32:49.194225700Z",
+  "timestamp": "2026-04-28T17:20:15.019979200Z",
+  "phase": "ENTER",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "open",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "open",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": false
+  },
+  "line": "12",
+  "signature": "void com.company.contest.File.open()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": []
+}
+{
+  "timestamp": "2026-04-28T17:20:15.020979200Z",
   "phase": "EXIT",
   "thread": "main",
-  "class": "com.company.contest.Main",
-  "method": "main",
-  "callerClass": "agent.MethodInterceptor",
-  "callerMethod": "none",
-  "line": "-1",
-  "signature": "public static void com.company.contest.Main.main(java.lang.String[])",
-  "instanceClass": null,
-  "arguments": [
-    {
-      "type": "[Ljava.lang.String;",
-      "value": "[Ljava.lang.String;@5fb97279"
-    }
-  ],
+  "class": "com.company.contest.File",
+  "method": "open",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "open",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": true
+  },
+  "line": "13",
+  "signature": "void com.company.contest.File.open()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": [],
   "returnValue": null,
   "exception": null,
-  "durationNs": 9935000
+  "durationNs": 262400
+}
+{
+  "timestamp": "2026-04-28T17:20:15.020979200Z",
+  "phase": "ENTER",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "read",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "read",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": true
+  },
+  "line": "16",
+  "signature": "java.lang.String com.company.contest.File.read()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": []
+}
+{
+  "timestamp": "2026-04-28T17:20:15.020979200Z",
+  "phase": "EXIT",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "read",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "read",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": true
+  },
+  "line": "16",
+  "signature": "java.lang.String com.company.contest.File.read()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": [],
+  "returnValue": {
+    "type": "java.lang.String",
+    "value": "read"
+  },
+  "exception": null,
+  "durationNs": 249800
+}
+{
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
+  "phase": "ENTER",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "read",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "read",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": true
+  },
+  "line": "16",
+  "signature": "java.lang.String com.company.contest.File.read()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": []
+}
+{
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
+  "phase": "EXIT",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "read",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "read",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": true
+  },
+  "line": "16",
+  "signature": "java.lang.String com.company.contest.File.read()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": [],
+  "returnValue": {
+    "type": "java.lang.String",
+    "value": "read"
+  },
+  "exception": null,
+  "durationNs": 150700
+}
+{
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
+  "phase": "ENTER",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "close",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "close",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": true
+  },
+  "line": "20",
+  "signature": "void com.company.contest.File.close()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": []
+}
+{
+  "timestamp": "2026-04-28T17:20:15.021979600Z",
+  "phase": "EXIT",
+  "thread": "main",
+  "class": "com.company.contest.File",
+  "method": "close",
+  "callerClass": "com.company.contest.File",
+  "callerMethod": "close",
+  "callerObjectId": "823758059",
+  "callerObject": {
+    "isOpen": false
+  },
+  "line": "21",
+  "signature": "void com.company.contest.File.close()",
+  "instanceClass": "com.company.contest.File",
+  "arguments": [],
+  "returnValue": null,
+  "exception": null,
+  "durationNs": 154000
 }

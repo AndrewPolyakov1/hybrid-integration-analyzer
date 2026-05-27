@@ -70,6 +70,7 @@ public final class Agent {
                                 .or(nameStartsWith("org.slf4j."))
                                 .or(nameStartsWith("ch.qos.logback."))
                                 .or(nameStartsWith("agent."))
+                                .or(nameStartsWith("filter."))
                 )
                 .type(filter)
                 .transform((builder, typeDescription, classLoader, module, protectionDomain) -> {

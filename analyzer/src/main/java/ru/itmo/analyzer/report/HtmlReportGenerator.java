@@ -1,12 +1,10 @@
 package ru.itmo.analyzer.report;
 
-import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import ru.itmo.analyzer.specification.verifier.model.VerificationResult;
-import ru.itmo.analyzer.specification.verifier.model.VerificationResult.Violation;
+import ru.itmo.analyzer.verifier.model.VerificationResult;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -135,7 +133,7 @@ public class HtmlReportGenerator {
         return model;
     }
 
-    private Map<String, Object> violationToMap(Violation v) {
+    private Map<String, Object> violationToMap(VerificationResult.Violation v) {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("eventIndex", v.eventIndex());
         m.put("type", v.type().name());

@@ -59,7 +59,7 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         }
 
         // ограничение глубины (очень важно!)
-        if (depth > 3) {
+        if (depth > 2) {
             return "\"<max-depth>\"";
         }
 
@@ -83,6 +83,9 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         // массивы
         if (clazz.isArray()) {
             int len = Array.getLength(obj);
+            if (len > 10) {
+                return "[]";
+            }
             StringBuilder sb = new StringBuilder();
             sb.append("[");
 
@@ -244,11 +247,13 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         comma(json);
         field(json, "callerMethod", caller.getMethodName());
         comma(json);
+        field(json, "callerObjectId", String.valueOf(System.identityHashCode(thiz)));
+        comma(json);
         json.append("\"callerObject\":");
         if (jsonCallerObj == null) {
             json.append("null");
         } else {
-            json.append(jsonCallerObj); // ← без кавычек
+            json.append(jsonCallerObj);
         }
         comma(json);
         field(json, "line", String.valueOf(caller.getLineNumber()));
@@ -345,7 +350,15 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
 
         void shutdown() {
             running = false;
-            interrupt();
+            try {
+                synchronized (QUEUE) {
+                    while (!QUEUE.isEmpty())
+                        QUEUE.wait();
+                }
+            } catch (InterruptedException ignored) {
+            } finally {
+                interrupt();
+            }
         }
 
         @Override
@@ -357,9 +370,14 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
                 long lastFlush = System.currentTimeMillis();
 
                 while (running || !QUEUE.isEmpty()) {
-                    String record = QUEUE.poll(500, TimeUnit.MILLISECONDS);
-                    if (record != null) {
-                        out.println(record);
+                    synchronized (QUEUE) {
+
+                        String record = QUEUE.poll(500, TimeUnit.MILLISECONDS);
+                        if (record != null) {
+                            out.println(record);
+                        }
+                        if (QUEUE.isEmpty())
+                            QUEUE.notify(); // notify the producer
                     }
 
                     long now = System.currentTimeMillis();
@@ -367,6 +385,9 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
                         out.flush();
                         lastFlush = now;
                     }
+
+                    if (QUEUE.isEmpty())
+                        QUEUE.notify();
                 }
 
                 out.flush();

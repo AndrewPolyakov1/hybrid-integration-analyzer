@@ -121,7 +121,7 @@ class FiniteAutomatonTest {
     void shouldFireTransitionSuccessfully() {
         var fa = FiniteAutomaton.fromDeclaration(simpleAutomaton());
 
-        var result = fa.tryFire("go");
+        var result = fa.tryFire("go", null);
 
         assertInstanceOf(FireResult.Success.class, result);
         assertEquals("S2", fa.getCurrentState());
@@ -131,7 +131,7 @@ class FiniteAutomatonTest {
     void shouldReturnNoTransition() {
         var fa = FiniteAutomaton.fromDeclaration(simpleAutomaton());
 
-        var result = fa.tryFire("unknown");
+        var result = fa.tryFire("unknown", null);
 
         assertInstanceOf(FireResult.NoTransition.class, result);
         assertEquals("S1", fa.getCurrentState());
@@ -176,7 +176,7 @@ class FiniteAutomatonTest {
 
         var fa = FiniteAutomaton.fromDeclaration(decl);
 
-        var result = fa.tryFire("go");
+        var result = fa.tryFire("go", null);
 
         assertInstanceOf(FireResult.GuardFailed.class, result);
         assertEquals("S1", fa.getCurrentState());

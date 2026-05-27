@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/agent/pom.xml" />
         <option value="$PROJECT_DIR$/client/pom.xml" />
         <option value="$PROJECT_DIR$/analyzer/pom.xml" />
+        <option value="$PROJECT_DIR$/libsl-parcer/pom.xml" />
       </list>
     </option>
   </component>

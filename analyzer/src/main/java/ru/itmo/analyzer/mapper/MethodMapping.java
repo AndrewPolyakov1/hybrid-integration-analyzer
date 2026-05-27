@@ -1,6 +1,8 @@
 package ru.itmo.analyzer.mapper;
 
-import ru.itmo.analyzer.specification.parser.model.ast.Specification;
+
+
+import ru.itmo.analyser.specification.parser.model.ast.Specification;
 
 import java.util.Collections;
 import java.util.HashSet;
