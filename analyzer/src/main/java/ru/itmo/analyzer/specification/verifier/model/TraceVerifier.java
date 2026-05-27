@@ -97,7 +97,7 @@ public class TraceVerifier {
         );
 
         // Попытка перехода
-        FireResult result = automaton.tryFire(functionName);
+        FireResult result = automaton.tryFire(functionName, null);
 
         switch (result) {
             case FireResult.Success s -> successfulTransitions++;

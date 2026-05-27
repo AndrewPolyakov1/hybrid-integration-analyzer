@@ -143,12 +143,13 @@ public class FiniteAutomaton {
      * target state. Otherwise, the automaton state remains unchanged.
      *
      * @param trigger the name of the triggering event
+     * @param context
      * @return a {@link FireResult} describing the outcome
      * @throws NullPointerException if {@code trigger} is {@code null}
      * @see FireResult
      */
-    public FireResult tryFire(String trigger) {
-        Objects.requireNonNull(trigger, "trigger");
+    public FireResult tryFire(String trigger, Map<String, Object> context) {
+        Objects.requireNonNull(trigger, "Function name is missing");
 
         var matching = transitions.stream()
                 .filter(t -> t.fromState().equals(currentState)
@@ -161,10 +162,10 @@ public class FiniteAutomaton {
         }
 
         for (var t : matching) {
-            String failedGuard = findFailedGuard(t.guards());
+            String failedGuard = findFailedGuard(t.guards(), context);
             if (failedGuard == null) {
                 for (var action : t.actions()) {
-                    executeStatement(action);
+                    executeStatement(action, context);
                 }
                 String prev = currentState;
                 currentState = t.toState();
@@ -172,7 +173,7 @@ public class FiniteAutomaton {
             }
         }
 
-        String failedGuard = findFailedGuard(matching.getFirst().guards());
+        String failedGuard = findFailedGuard(matching.getFirst().guards(), context);
         return new FireResult.GuardFailed(
                 currentState, trigger,
                 failedGuard != null ? failedGuard : "unknown");
@@ -189,7 +190,7 @@ public class FiniteAutomaton {
      * @throws NullPointerException  if {@code trigger} is {@code null}
      */
     public void fire(String trigger) {
-        switch (tryFire(trigger)) {
+        switch (tryFire(trigger, null)) {
             case FireResult.Success s -> System.out.printf("  [transition] %s --[%s]--> %s%n",
                     s.fromState(), s.trigger(), s.toState());
             case FireResult.NoTransition n -> throw new IllegalStateException(
@@ -288,8 +289,7 @@ public class FiniteAutomaton {
         Objects.requireNonNull(trigger, "trigger");
         return transitions.stream()
                 .anyMatch(t -> t.fromState().equals(currentState)
-                        && t.trigger().equals(trigger)
-                        && findFailedGuard(t.guards()) == null);
+                        && t.trigger().equals(trigger));
     }
 
     /**
@@ -301,7 +301,6 @@ public class FiniteAutomaton {
     public List<String> getAvailableTriggers() {
         return transitions.stream()
                 .filter(t -> t.fromState().equals(currentState))
-                .filter(t -> findFailedGuard(t.guards()) == null)
                 .map(Transition::trigger)
                 .distinct()
                 .toList();
@@ -328,9 +327,9 @@ public class FiniteAutomaton {
         return sb.toString();
     }
 
-    private String findFailedGuard(List<Requirement> guards) {
+    private String findFailedGuard(List<Requirement> guards, Map<String, Object> context) {
         for (var guard : guards) {
-            Object result = evalExpression(guard.condition());
+            Object result = evalExpression(guard.condition(), context);
             if (result instanceof Boolean b && !b) {
                 return guard.name();
             }
@@ -338,19 +337,24 @@ public class FiniteAutomaton {
         return null;
     }
 
-    private Object evalExpression(Expression expr) {
+    private Object evalExpression(Expression expr, Map<String, Object> context) {
         return switch (expr) {
             case Expression.BoolLiteral(var v) -> v;
             case Expression.IntLiteral(var v) -> v;
             case Expression.StringLiteral(var v) -> v;
-            case Expression.VarRef(var n) -> variables.get(n);
-            case Expression.Not(var operand) -> !(Boolean) evalExpression(operand);
+            case Expression.VarRef(var n) -> {
+                if (context.containsKey(n)) {
+                    yield context.get(n);
+                }
+                yield variables.get(n);
+            }
+            case Expression.Not(var operand) -> !(Boolean) evalExpression(operand, context);
         };
     }
 
-    private void executeStatement(Statement stmt) {
+    private void executeStatement(Statement stmt, Map<String, Object> stringObjectMap) {
         if (stmt instanceof Statement.Assignment(var variable, var value)) {
-            variables.put(variable, evalExpression(value));
+            variables.put(variable, evalExpression(value, stringObjectMap));
         }
     }
 

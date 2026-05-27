@@ -19,9 +19,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class E2ETest {
@@ -51,16 +48,44 @@ public class E2ETest {
                 shift Opened -> Closed(close);
             
                 fun create()
-                    requires isNotExists: !exists
+                    requires isNotExists: !exists;
+                fun delete()
                 {
                     exists = true;
                 }
-            
                 fun open();
                 fun close();
             }
             """;
-
+    private final String lucenseSpec = """
+            libsl "1.0.0";
+            library File version "1.0.0";
+            types {
+                File (custom.lib.File);
+                String (string)
+            }
+            
+            automaton org.apache.lucene.analysis.TokenStream : TokenStream {
+                initstate Start;
+                state Work;
+                state End;
+                state Closed;
+            
+                var exists: bool = false;
+            
+                shift Start -> Work(reset);
+                shift Work -> Work(incrementToken);
+                shift Work -> End(end);
+                shift End -> Closed(close);
+                shift End -> End(end);
+                shift Closed -> Work(reset);
+            
+                fun reset();
+                fun incrementToken();
+                fun end();
+                fun close();
+            }
+            """;
     private VerificationResult res;
 
     @Test
@@ -190,36 +215,6 @@ public class E2ETest {
         System.out.println("\n═══ 5. VERIFICATION — SCENARIO B ═══");
         System.out.println("   (полный корректный трейс: create → open → close)\n");
     }
-
-    private final String lucenseSpec = """
-            libsl "1.0.0";
-            library File version "1.0.0";
-            types {
-                File (custom.lib.File);
-                String (string)
-            }
-            
-            automaton org.apache.lucene.analysis.TokenStream : TokenStream {
-                initstate Start;
-                state Work;
-                state End;
-                state Closed;
-            
-                var exists: bool = false;
-            
-                shift Start -> Work(reset);
-                shift Work -> Work(incrementToken);
-                shift Work -> End(end);
-                shift End -> Closed(close);
-                shift End -> End(end);
-                shift Closed -> Work(reset);
-            
-                fun reset();
-                fun incrementToken();
-                fun end();
-                fun close();
-            }
-            """;
 
     @Test
     public void testFullPipelineLucene() throws TemplateException, IOException {
