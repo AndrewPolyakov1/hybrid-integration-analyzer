@@ -21,7 +21,6 @@ public class InjectorHelper {
     private static final String[] CLASSES_TO_INJECT = {
             "ru.itmo.interceptor.InterceptorAction",        // The Interface
             "ru.itmo.interceptor.impl.LoggingInterceptorAction", // The Implementation
-            "ru.itmo.interceptor.impl.FunctionalInterceptorAction", // The Implementation
             "ru.itmo.interceptor.impl.AsyncJsonFileLoggingInterceptorAction", // The Implementation
             "agent.MethodInterceptor"                      // The Advice Class
     };
@@ -65,14 +64,16 @@ public class InjectorHelper {
         }
     }
 
-    private static byte[] getClassBytes(String className) throws IOException {
+    public static byte[] getClassBytes(String className) throws IOException {
         String resource = className.replace('.', '/') + ".class";
         try (InputStream is = InjectorHelper.class.getClassLoader().getResourceAsStream(resource)) {
             if (is == null) {
                 throw new IOException("Could not find class resource: " + resource +
                         ". Check if it's in the JAR.");
             }
-            return is.readAllBytes();
+            byte[] bytes = new byte[]{};
+            is.read(bytes);
+            return bytes;
         }
     }
 }

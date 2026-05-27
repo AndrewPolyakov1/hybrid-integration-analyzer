@@ -5,8 +5,12 @@ import ru.itmo.interceptor.InterceptorAction;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +45,110 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         WRITER.start();
         Runtime.getRuntime().addShutdownHook(
                 new Thread(WRITER::shutdown, "agent-writer-shutdown"));
+    }
+
+    public static String toJson(Object obj,
+                                Map<Object, Boolean> visited,
+                                int depth) throws IllegalAccessException {
+
+        if (obj == null) return "null";
+
+        // защита от циклов
+        if (visited.containsKey(obj)) {
+            return "\"<cycle>\"";
+        }
+
+        // ограничение глубины (очень важно!)
+        if (depth > 3) {
+            return "\"<max-depth>\"";
+        }
+
+        Class<?> clazz = obj.getClass();
+
+        // примитивы + обёртки + строки
+        if (clazz.isPrimitive() ||
+                obj instanceof Number ||
+                obj instanceof Boolean) {
+            return obj.toString();
+        }
+
+        if (obj instanceof String) {
+            return "\"" + escape((String) obj) + "\"";
+        }
+
+        if (clazz.isEnum()) {
+            return "\"" + obj.toString() + "\"";
+        }
+
+        // массивы
+        if (clazz.isArray()) {
+            int len = Array.getLength(obj);
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+
+            for (int i = 0; i < len; i++) {
+                if (i > 0) sb.append(",");
+                sb.append(toJson(Array.get(obj, i), visited, depth + 1));
+            }
+
+            sb.append("]");
+            return sb.toString();
+        }
+
+        // помечаем как посещённый
+        visited.put(obj, true);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+
+        boolean first = true;
+
+        while (clazz != null) {
+            Field[] fields = clazz.getDeclaredFields();
+
+            for (Field field : fields) {
+                field.setAccessible(true);
+
+                if (!first) sb.append(",");
+                first = false;
+
+                sb.append("\"").append(field.getName()).append("\":");
+
+                Object value = field.get(obj);
+                sb.append(toJson(value, visited, depth + 1));
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private static String escape(String s) {
+        StringBuilder out = new StringBuilder(s.length() + 16);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '"') {
+                out.append("\\\"");
+            } else if (c == '\\') {
+                out.append("\\\\");
+            } else if (c == '\n') {
+                out.append("\\n");
+            } else if (c == '\r') {
+                out.append("\\r");
+            } else if (c == '\t') {
+                out.append("\\t");
+            } else {
+                if (c < 32) {
+                    out.append("\\u")
+                            .append(String.format("%04x", (int) c));
+                } else {
+                    out.append(c);
+                }
+            }
+        }
+        return out.toString();
     }
 
     @Override
@@ -110,6 +218,16 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
     ) {
         StringBuilder json = new StringBuilder(512);
 
+        String jsonCallerObj = null;
+        if (thiz != null) {
+            try {
+                jsonCallerObj = toJson(thiz, new IdentityHashMap<>(), 0);
+                System.out.println(jsonCallerObj);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
         json.append('{');
 
         field(json, "timestamp", Instant.now().toString());
@@ -125,6 +243,13 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         field(json, "callerClass", caller.getClassName());
         comma(json);
         field(json, "callerMethod", caller.getMethodName());
+        comma(json);
+        json.append("\"callerObject\":");
+        if (jsonCallerObj == null) {
+            json.append("null");
+        } else {
+            json.append(jsonCallerObj); // ← без кавычек
+        }
         comma(json);
         field(json, "line", String.valueOf(caller.getLineNumber()));
         comma(json);
@@ -209,29 +334,6 @@ public final class AsyncJsonFileLoggingInterceptorAction implements InterceptorA
         field(json, "message", t.getMessage());
         json.append('}');
         return json.toString();
-    }
-
-    private String escape(String s) {
-        StringBuilder out = new StringBuilder(s.length() + 16);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> out.append("\\\"");
-                case '\\' -> out.append("\\\\");
-                case '\n' -> out.append("\\n");
-                case '\r' -> out.append("\\r");
-                case '\t' -> out.append("\\t");
-                default -> {
-                    if (c < 32) {
-                        out.append("\\u")
-                                .append(String.format("%04x", (int) c));
-                    } else {
-                        out.append(c);
-                    }
-                }
-            }
-        }
-        return out.toString();
     }
 
     /**

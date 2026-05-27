@@ -39,14 +39,15 @@
 
     <build>
         <plugins>
+
             <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
 
@@ -74,7 +75,7 @@
                                         <Can-Retransform-Classes>true</Can-Retransform-Classes>
 
                                         <!-- Optional: Agent-Class if you support dynamic attach -->
-                                        <!-- <Agent-Class>agent.Agent</Agent-Class> -->
+                                         <Agent-Class>agent.Agent</Agent-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
@@ -90,6 +91,12 @@
                                     </excludes>
                                 </filter>
                             </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.bytebuddy</pattern>
+                                    <shadedPattern>agent.shadow.bytebuddy</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>

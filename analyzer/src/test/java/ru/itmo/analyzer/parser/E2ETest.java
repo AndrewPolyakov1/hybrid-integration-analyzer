@@ -1,7 +1,6 @@
 package ru.itmo.analyzer.parser;
 
 import freemarker.template.TemplateException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.itmo.analyzer.mapper.MethodMapping;
 import ru.itmo.analyzer.report.HtmlReportGenerator;
@@ -9,7 +8,6 @@ import ru.itmo.analyzer.specification.parser.Lexer;
 import ru.itmo.analyzer.specification.parser.LibSlParser;
 import ru.itmo.analyzer.specification.parser.automaton.FiniteAutomaton;
 import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.Specification;
 import ru.itmo.analyzer.specification.verifier.model.TraceVerifier;
 import ru.itmo.analyzer.specification.verifier.model.VerificationResult;
 import ru.itmo.analyzer.trace.model.TraceEvent;
@@ -192,4 +190,103 @@ public class E2ETest {
         System.out.println("\n═══ 5. VERIFICATION — SCENARIO B ═══");
         System.out.println("   (полный корректный трейс: create → open → close)\n");
     }
+
+    private final String lucenseSpec = """
+            libsl "1.0.0";
+            library File version "1.0.0";
+            types {
+                File (custom.lib.File);
+                String (string)
+            }
+            
+            automaton org.apache.lucene.analysis.TokenStream : TokenStream {
+                initstate Start;
+                state Work;
+                state End;
+                state Closed;
+            
+                var exists: bool = false;
+            
+                shift Start -> Work(reset);
+                shift Work -> Work(incrementToken);
+                shift Work -> End(end);
+                shift End -> Closed(close);
+                shift End -> End(end);
+                shift Closed -> Work(reset);
+            
+                fun reset();
+                fun incrementToken();
+                fun end();
+                fun close();
+            }
+            """;
+
+    @Test
+    public void testFullPipelineLucene() throws TemplateException, IOException {
+        System.out.println("═══ 1. PARSING LibSL SPEC ═══\n");
+
+        var lexer = new Lexer(lucenseSpec);
+        var tokens = lexer.tokenize();
+        var parser = new LibSlParser(tokens);
+        var spec = parser.parse();
+
+        AutomatonDeclaration automatonDecl = spec.automata().getFirst();
+        FiniteAutomaton reference = FiniteAutomaton.fromDeclaration(automatonDecl);
+        System.out.println(reference);
+
+        // ═════════════════════════════════════════════════════════
+        //  4. ПАРСИНГ ТРЕЙСА
+        // ═════════════════════════════════════════════════════════
+        System.out.println("═══ 2. PARSING TRACE ═══\n");
+        File source = new File("src/test/resources/agent-method-calls-lucene.jsonl");
+        List<TraceEvent> events = List.of();
+        TraceEventParser traceEventParser = new TraceEventParser();
+        try {
+            var result = traceEventParser.parse(source);
+            events = result;
+            logger.info(String.valueOf(result));
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+        System.out.println("Parsed " + events.size() + " trace events:");
+        events.forEach(e -> System.out.println("  " + e));
+
+        // ═════════════════════════════════════════════════════════
+        //  5. НАСТРОЙКА МАППИНГА
+        // ═════════════════════════════════════════════════════════
+        System.out.println("\n═══ 3. METHOD MAPPING ═══\n");
+
+        // Сценарий A: openFile → open, closeFile → close
+        // (create не вызывается в трейсе → нарушение!)
+        var mappingA = MethodMapping.builder()
+                .fromSpec(spec)
+//                .map("org.apache.lucene.analysis.TokenStream", "end", "end")
+//                .map("org.apache.lucene.analysis.TokenStream", "incrementToken", "incrementToken")
+//                .map("org.apache.lucene.analysis.TokenStream", "reset", "reset")
+//                .map("org.apache.lucene.analysis.TokenStream", "close", "close")
+                .build();
+
+        System.out.println("Mapping A (без create):");
+        System.out.println(mappingA);
+
+        // ═════════════════════════════════════════════════════════
+        //  6. ВЕРИФИКАЦИЯ — СЦЕНАРИЙ A (ожидаем нарушение)
+        // ═════════════════════════════════════════════════════════
+        System.out.println("\n═══ 4. VERIFICATION — SCENARIO A ═══");
+        System.out.println("   (open/close без предварительного create)\n");
+
+        var verifierA = new TraceVerifier(automatonDecl, mappingA);
+        VerificationResult resultA = verifierA.verify(events);
+        System.out.println(resultA);
+
+        var generator = new HtmlReportGenerator();
+        generator.generateToFile(resultA, Path.of("build", "reports", "verification.html"));
+
+        // ═════════════════════════════════════════════════════════
+        //  7. ВЕРИФИКАЦИЯ — СЦЕНАРИЙ B (корректный трейс)
+        // ═════════════════════════════════════════════════════════
+        System.out.println("\n═══ 5. VERIFICATION — SCENARIO B ═══");
+        System.out.println("   (полный корректный трейс: create → open → close)\n");
+    }
+
 }

@@ -2,9 +2,13 @@ package agent;
 
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
+import net.bytebuddy.description.NamedElement;
+import net.bytebuddy.matcher.ElementMatcher;
 
-import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static net.bytebuddy.matcher.ElementMatchers.any;
 import static net.bytebuddy.matcher.ElementMatchers.isAbstract;
@@ -16,7 +20,7 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 /**
  * Java agent entry point.
  *
- * <p>Installs a {@link net.bytebuddy.agent.builder.AgentBuilder} that instruments
+ * <p>Installs a {@link AgentBuilder} that instruments
  * all loaded classes (except ignored ones) by applying {@link MethodInterceptor}
  * advice to their methods.
  *
@@ -30,12 +34,29 @@ public final class Agent {
      *
      * @param agentArgs agent arguments
      * @param inst      instrumentation instance provided by the JVM
-     * @throws IOException if dependency injection fails
      */
-    public static void premain(String agentArgs, Instrumentation inst) throws IOException {
+    public static void premain(String agentArgs, Instrumentation inst) {
         System.out.println("[Agent] Started");
 
+        List<String> filterData = agentArgs != null ? Arrays.asList(agentArgs.split("\\s*,\\s*")) : new ArrayList<>();
+        System.out.println("[Agent] Filter: " + filterData);
+
+        ElementMatcher.Junction<NamedElement> filter = null;
+        for (String element : filterData) {
+            if (filter == null) {
+                filter = nameStartsWith(element);
+                System.out.println("[Agent] start filter: " + element);
+            } else {
+                filter = filter.or(nameStartsWith(element));
+                System.out.println("[Agent] extend filter: " + element);
+            }
+        }
+        if (filter == null) {
+            filter = any();
+        }
+
         new AgentBuilder.Default()
+                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                 .ignore(
                         nameStartsWith("net.bytebuddy.")
                                 .or(nameStartsWith("java."))
@@ -50,7 +71,7 @@ public final class Agent {
                                 .or(nameStartsWith("ch.qos.logback."))
                                 .or(nameStartsWith("agent."))
                 )
-                .type(any())
+                .type(filter)
                 .transform((builder, typeDescription, classLoader, module, protectionDomain) -> {
                     try {
                         InjectorHelper.ensureInjected(classLoader);
