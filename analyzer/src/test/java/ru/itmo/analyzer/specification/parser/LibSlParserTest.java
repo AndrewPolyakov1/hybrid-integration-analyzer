@@ -1,8 +1,9 @@
 package ru.itmo.analyzer.specification.parser;
 
 import org.junit.jupiter.api.Test;
-import ru.itmo.analyzer.specification.parser.error.ParseException;
-import ru.itmo.analyzer.specification.parser.model.ast.Specification;
+import ru.itmo.analyser.specification.parser.LibSlParser;
+import ru.itmo.analyser.specification.parser.error.ParseException;
+import ru.itmo.analyser.specification.parser.model.ast.Specification;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

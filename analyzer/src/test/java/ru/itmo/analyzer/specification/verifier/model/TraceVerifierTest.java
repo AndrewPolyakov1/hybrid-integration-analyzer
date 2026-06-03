@@ -2,17 +2,19 @@ package ru.itmo.analyzer.specification.verifier.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.itmo.analyser.specification.parser.model.ast.AutomatonDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.Expression;
+import ru.itmo.analyser.specification.parser.model.ast.FunctionDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.Requirement;
+import ru.itmo.analyser.specification.parser.model.ast.ShiftDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.StateDeclaration;
 import ru.itmo.analyzer.mapper.MethodMapping;
-import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.Expression;
-import ru.itmo.analyzer.specification.parser.model.ast.FunctionDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.Requirement;
-import ru.itmo.analyzer.specification.parser.model.ast.ShiftDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.StateDeclaration;
 import ru.itmo.analyzer.trace.model.ClassInfo;
 import ru.itmo.analyzer.trace.model.MethodInfo;
 import ru.itmo.analyzer.trace.model.ThreadInfo;
 import ru.itmo.analyzer.trace.model.TraceEvent;
+import ru.itmo.analyzer.verifier.TraceVerifier;
+import ru.itmo.analyzer.verifier.model.VerificationResult;
 
 import java.util.List;
 import java.util.Optional;

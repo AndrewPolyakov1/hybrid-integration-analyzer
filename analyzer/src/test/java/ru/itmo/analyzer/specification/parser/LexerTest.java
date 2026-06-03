@@ -1,9 +1,11 @@
 package ru.itmo.analyzer.specification.parser;
 
 import org.junit.jupiter.api.Test;
-import ru.itmo.analyzer.specification.parser.error.ParseException;
-import ru.itmo.analyzer.specification.parser.model.tokenizer.Token;
-import ru.itmo.analyzer.specification.parser.model.tokenizer.TokenType;
+import ru.itmo.analyser.specification.parser.Lexer;
+import ru.itmo.analyser.specification.parser.error.ParseException;
+import ru.itmo.analyser.specification.parser.model.tokenizer.Token;
+import ru.itmo.analyser.specification.parser.model.tokenizer.TokenType;
+
 
 import java.util.List;
 
