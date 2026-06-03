@@ -1,14 +1,17 @@
 package ru.itmo.analyzer.specification.parser.automaton;
 
 import org.junit.jupiter.api.Test;
-import ru.itmo.analyzer.specification.parser.model.ast.AutomatonDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.Expression;
-import ru.itmo.analyzer.specification.parser.model.ast.FunctionDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.Requirement;
-import ru.itmo.analyzer.specification.parser.model.ast.ShiftDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.StateDeclaration;
-import ru.itmo.analyzer.specification.parser.model.ast.Statement;
-import ru.itmo.analyzer.specification.parser.model.ast.VariableDeclaration;
+import ru.itmo.analyser.specification.parser.automaton.FiniteAutomaton;
+import ru.itmo.analyser.specification.parser.automaton.FireResult;
+import ru.itmo.analyser.specification.parser.model.ast.AutomatonDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.Expression;
+import ru.itmo.analyser.specification.parser.model.ast.FunctionDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.Requirement;
+import ru.itmo.analyser.specification.parser.model.ast.ShiftDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.StateDeclaration;
+import ru.itmo.analyser.specification.parser.model.ast.Statement;
+import ru.itmo.analyser.specification.parser.model.ast.VariableDeclaration;
+
 
 import java.util.List;
 
